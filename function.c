@@ -1,6 +1,4 @@
-#include <stdlib.h>
 #include "header.h"
-
 char ** readWriteFile() {
 
     char str[SIZE];
@@ -13,7 +11,7 @@ char ** readWriteFile() {
     time_t rawtime;
     struct tm * timeinfo;
 
-    f = fopen("time.txt", "r");
+    f = fopen("time.txt", "w");
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
 

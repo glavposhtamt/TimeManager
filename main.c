@@ -1,4 +1,4 @@
-#include "header.h"
+#include "function.c"
 
 #define SIZE 128
 /*

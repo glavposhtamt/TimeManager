@@ -7,11 +7,12 @@ char ** readWriteFile() {
     char ** bigstr = (char **)malloc(128 * sizeof(char *));
     for(; i < 128; ++i) bigstr[i] = (char *)malloc(128 * sizeof(char *));
     i = 0;
-    FILE * f;
+    FILE * f, *fr;
     time_t rawtime;
     struct tm * timeinfo;
 
-    f = fopen("time.txt", "w");
+    f = fopen("time.txt", "a");
+    fr = fopen("time.txt", "r");
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
 
@@ -20,13 +21,14 @@ char ** readWriteFile() {
 
     fprintf(f, "%02d:%02d %02d-%02d-%04d\t%s\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_mday, timeinfo->tm_mon, timeinfo->tm_year + 1900, str);
 
-    while (fgets (str, SIZE, f) != NULL)  {
+    while (fgets (str, SIZE, fr) != NULL)  {
             for(; str[i] != '\n'; ++i )
                 bigstr[j][i] = str[i];
             j++, i = 0;
     }
 
     fclose(f);
+    fclose(fr);
     return bigstr;
 }
 

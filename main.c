@@ -1,4 +1,4 @@
-#include "function.c"
+#include "header.h"
 
 #define SIZE 128
 
@@ -6,11 +6,12 @@ int main(){
     int i = 0;
     char ** bigstr;
     mt * myt;
-    bigstr = readWriteFile();
+    writeFile();
+    bigstr = readFile();
 
-   myt = getStruct(bigstr);
+    myt = getStruct(bigstr);
 
-   printf("%d\t%d\t%d\n", myt->arrTimeinfo[0].tm_min, myt->arrTimeinfo[1].tm_min, myt->length);
+   printf("%d\t%s\t%d\n", myt[0].arrTimeinfo.tm_min, myt[0].message, myt[0].length);
 
 /*Освобождаем выделенную память*/
     for(; i < 128; ++i) free(bigstr[i]);

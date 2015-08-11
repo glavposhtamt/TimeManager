@@ -9,15 +9,19 @@
 #define SIZE 128
 
 struct myTymeInfo {
-  struct tm arrTimeinfo[128];
+  struct tm arrTimeinfo;
+  char * message;
   unsigned short length;
 };
 
 typedef struct myTymeInfo mt;
 
-extern char ** readWriteFile();
+extern char ** readFile();
+extern void writeFile();
 extern  mt * getStruct( char ** bigstr );
 extern int a;
+
+#include "function.c"
 
 #endif // HEADER
 

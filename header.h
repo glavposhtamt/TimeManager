@@ -5,6 +5,9 @@
 #include <sqlite3.h> 
 
 extern void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char **, char **));
+extern void initTable(sqlite3 * db, int (* callback)(void *, int, char **, char **));
+extern void addTask(char ** msg, sqlite3 * db, int (* callback)(void *, int, char **, char **));
+extern void selectAll(sqlite3 * db, int (* callback)(void *, int, char **, char **));
 
 #endif // HEADER
 

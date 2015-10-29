@@ -23,7 +23,8 @@ void initTable(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
    char * sql = "CREATE TABLE TIME("  \
                 "ID       INT PRIMARY KEY  NOT NULL," \
                 "DATE     datetime         NOT NULL," \
-                "MESSAGE  CHAR(100)        NOT NULL);";
+                "MESSAGE  CHAR(100)        NOT NULL," \
+                "STATUS   INT DEFAULT 0    NOT NULL) IF NOT EXISTS;";
 
    sqlQuery(db, sql, callback);
     

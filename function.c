@@ -24,7 +24,7 @@ void initTable(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
                 "ID       INT PRIMARY KEY  NOT NULL," \
                 "DATE     datetime         NOT NULL," \
                 "MESSAGE  CHAR(100)        NOT NULL," \
-                "STATUS   INT DEFAULT 0    NOT NULL) IF NOT EXISTS;";
+                "STATUS   INT DEFAULT 0);";
 
    sqlQuery(db, sql, callback);
     
@@ -34,8 +34,8 @@ void initTable(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
 
 void addTask(char ** msg, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
     
-   char * sql = "INSERT INTO TIME (ID,DATE,MESSAGE) "  \
-                "VALUES (1, datetime('now'), 'Test');";
+   char * sql = "INSERT INTO TIME (ID, DATE, MESSAGE) "  \
+                "VALUES (3, datetime('now'), 'Test');";
    sqlQuery(db, sql, callback);
     
    sqlite3_close(db);

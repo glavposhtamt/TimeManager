@@ -1,4 +1,5 @@
 /* Compile flag -lsqlite3 */
+/* cc -o time main.c function.c -g -Wall -lsqlite3 */
 
 #include "header.h"
 
@@ -26,8 +27,8 @@ int main(int argc, char * argv[])
       fprintf(stderr, "Opened database successfully\n");
    }
     
-/*    initTable(db, callback);
-    addTask(argv, db, callback);*/
+   /* initTable(db, callback);*/
+   /* addTask(argv, db, callback);*/
     selectAll(db, callback);
 
     
@@ -37,8 +38,6 @@ int main(int argc, char * argv[])
     
 /*    sql = "DELETE from COMPANY where ID=2; " \
          "SELECT * from COMPANY";*/
-
-   /* Execute SQL statement */
     
 
    return 0;

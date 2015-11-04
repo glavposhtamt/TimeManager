@@ -22,7 +22,7 @@ void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char
 void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
    char * time = "CREATE TABLE IF NOT EXISTS TIME (" \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-                    "DATE     datetime         NOT NULL," \
+                    "DATE     date             NOT NULL," \
                     "MESSAGE  CHAR(100)        NOT NULL," \
                     "STATUS   INT              DEFAULT 0 );";
     
@@ -35,31 +35,29 @@ void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
    sqlQuery(db, time, callback);    
    sqlQuery(db, task, callback);
     
-   //sqlite3_close(db);
+   
     
 }
 
 void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
     
-    char * sql = "INSERT INTO TIME (DATE, MESSAGE) VALUES (datetime('now'), '";
+    char * sql = "INSERT INTO TIME (DATE, MESSAGE) VALUES (date('now'), '";
     
     char * tmp = (char *)malloc(124);
     strcpy(tmp, sql);
     strcat(tmp, msg);
     strcat(tmp, "');");
         
-    sqlQuery(db, sql, callback);    
-    //sqlite3_close(db);
+    sqlQuery(db, tmp, callback);    
     
-    printf("%s\n", tmp);
+    /*printf("%s\n", tmp);*/
     free(tmp);
 }
 
 
 void selectAll(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    const char * sql = "SELECT * from TIME";
+    const char * sql = "SELECT * from TIME WHERE date = date('now')";
     
     sqlQuery(db, sql, callback);
     
-    sqlite3_close(db);
 }

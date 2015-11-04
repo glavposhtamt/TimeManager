@@ -29,12 +29,13 @@ int main(int argc, char * argv[])
     
     initTables(db, callback);
     
+    /* Парсинг флаг -m */
     if(argc > 1) addDoing(argv[1], db, callback);
     else printf("Введи аргументы!\n");
+
+    selectAll(db, callback);
     
     sqlite3_close(db);
-   /* selectAll(db, callback);*/
-
     
     
 /*    sql = "UPDATE COMPANY set SALARY = 25000.00 where ID=1; " \

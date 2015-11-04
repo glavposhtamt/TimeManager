@@ -19,26 +19,40 @@ void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char
 
 /*Продумать открытие/закрытие соединения*/
 
-void initTable(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-   char * sql = "CREATE TABLE TIME("  \
-                "ID       INT PRIMARY KEY  NOT NULL," \
-                "DATE     datetime         NOT NULL," \
-                "MESSAGE  CHAR(100)        NOT NULL," \
-                "STATUS   INT DEFAULT 0);";
-
-   sqlQuery(db, sql, callback);
+void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+   char * time = "CREATE TABLE IF NOT EXISTS TIME (" \
+                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+                    "DATE     datetime         NOT NULL," \
+                    "MESSAGE  CHAR(100)        NOT NULL," \
+                    "STATUS   INT              DEFAULT 0 );";
     
-   sqlite3_close(db);
+    char * task = "CREATE TABLE IF NOT EXISTS TASK ("  \
+                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+                    "TIMEID   INTEGER          NOT NULL," \
+                    "START    datetime         NOT NULL," \
+                    "STOP     datetime         NOT NULL);";
+
+   sqlQuery(db, time, callback);    
+   sqlQuery(db, task, callback);
+    
+   //sqlite3_close(db);
     
 }
 
-void addTask(char ** msg, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
     
-   char * sql = "INSERT INTO TIME (ID, DATE, MESSAGE) "  \
-                "VALUES (3, datetime('now'), 'Test');";
-   sqlQuery(db, sql, callback);
+    char * sql = "INSERT INTO TIME (DATE, MESSAGE) VALUES (datetime('now'), '";
     
-   sqlite3_close(db);
+    char * tmp = (char *)malloc(124);
+    strcpy(tmp, sql);
+    strcat(tmp, msg);
+    strcat(tmp, "');");
+        
+    sqlQuery(db, sql, callback);    
+    //sqlite3_close(db);
+    
+    printf("%s\n", tmp);
+    free(tmp);
 }
 
 

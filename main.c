@@ -27,9 +27,13 @@ int main(int argc, char * argv[])
       fprintf(stderr, "Opened database successfully\n");
    }
     
-   /* initTable(db, callback);*/
-   /* addTask(argv, db, callback);*/
-    selectAll(db, callback);
+    initTables(db, callback);
+    
+    if(argc > 1) addDoing(argv[1], db, callback);
+    else printf("Введи аргументы!\n");
+    
+    sqlite3_close(db);
+   /* selectAll(db, callback);*/
 
     
     

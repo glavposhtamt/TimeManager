@@ -61,3 +61,14 @@ void selectAll(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
     sqlQuery(db, sql, callback);
     
 }
+
+void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+    char * sql = "DELETE from TIME where ID = ";
+    char * tmp = (char *)malloc(124);
+    strcpy(tmp, sql);
+    strcat(tmp, (char *)id);
+    strcat(tmp, ";");
+    
+    printf("%s\n", tmp);
+    free(tmp);
+}

@@ -40,35 +40,28 @@ void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
 }
 
 void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+    char query[124];
+    char * sql = "INSERT INTO TIME (DATE, MESSAGE) VALUES (date('now')";
     
-    char * sql = "INSERT INTO TIME (DATE, MESSAGE) VALUES (date('now'), '";
-    
-    char * tmp = (char *)malloc(124);
-    strcpy(tmp, sql);
-    strcat(tmp, msg);
-    strcat(tmp, "');");
-        
-    sqlQuery(db, tmp, callback);    
-    
-    /*printf("%s\n", tmp);*/
-    free(tmp);
+    sprintf(query, "%s, '%s');", sql, msg);
+            
+    sqlQuery(db, query, callback);    
+
 }
 
 
-void selectAll(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    const char * sql = "SELECT * from TIME WHERE date = date('now')";
+void selectAll(int flag, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+    const char * sql = flag ? "SELECT * from TIME WHERE date = date('now')" : "SELECT * from TIME;";
     
     sqlQuery(db, sql, callback);
     
 }
 
 void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    char * sql = "DELETE from TIME where ID = ";
-    char * tmp = (char *)malloc(124);
-    strcpy(tmp, sql);
-    strcat(tmp, (char *)id);
-    strcat(tmp, ";");
+    char query[124];
+    char * sql = "DELETE from TIME where ID =";
+    sprintf(query, "%s %d;", sql, id);
     
-    printf("%s\n", tmp);
-    free(tmp);
+    sqlQuery(db, query, callback);
+
 }

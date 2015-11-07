@@ -33,9 +33,9 @@ int main(int argc, char * argv[])
     if(argc > 1) addDoing(argv[1], db, callback);
     else printf("Введи аргументы!\n");
 
-    selectAll(db, callback);
+    selectAll(0, db, callback);
     
-    deleteTask(5, db, callback);
+    deleteTask(8, db, callback);
     
     sqlite3_close(db);
     
@@ -43,8 +43,6 @@ int main(int argc, char * argv[])
 /*    sql = "UPDATE COMPANY set SALARY = 25000.00 where ID=1; " \
          "SELECT * from COMPANY";*/
     
-/*    sql = "DELETE from COMPANY where ID=2; " \
-         "SELECT * from COMPANY";*/
     
 
    return 0;

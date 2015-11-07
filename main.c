@@ -35,13 +35,12 @@ int main(int argc, char * argv[])
 
     selectAll(0, db, callback);
     
-    deleteTask(8, db, callback);
+    deleteTask(0, db, callback);
     
     sqlite3_close(db);
     
     
-/*    sql = "UPDATE COMPANY set SALARY = 25000.00 where ID=1; " \
-         "SELECT * from COMPANY";*/
+/*    sql = "UPDATE COMPANY set SALARY = 25000.00 where ID=1; " */
     
     
 

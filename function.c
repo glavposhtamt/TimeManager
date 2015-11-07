@@ -59,8 +59,11 @@ void selectAll(int flag, sqlite3 * db, int (* callback)(void *, int, char **, ch
 
 void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
     char query[124];
-    char * sql = "DELETE from TIME where ID =";
-    sprintf(query, "%s %d;", sql, id);
+    if(id){
+        char * sql = "DELETE from TIME where ID =";
+        sprintf(query, "%s %d;", sql, id);
+    }else strcpy(query, "DELETE FROM TIME;");
+    
     
     sqlQuery(db, query, callback);
 

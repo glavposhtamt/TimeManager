@@ -35,7 +35,7 @@ int main(int argc, char * argv[])
 
     selectAll(0, db, callback);
     
-    deleteTask(0, db, callback);
+    deleteTask(0, db, callback, 1);
     
     sqlite3_close(db);
     

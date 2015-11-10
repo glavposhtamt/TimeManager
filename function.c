@@ -51,20 +51,24 @@ void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, c
 
 
 void selectAll(int flag, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    const char * sql = flag ? "SELECT * from TIME WHERE date = date('now')" : "SELECT * from TIME;";
+    const char * sql = flag ? "SELECT * FROM TIME WHERE date = date('now')" : "SELECT * from TIME;";
     
     sqlQuery(db, sql, callback);
     
 }
 
-void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    char query[124];
-    if(id){
+void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){    
+    if(!flag && id && id > 0){
+        char query[124];
         char * sql = "DELETE from TIME where ID =";
         sprintf(query, "%s %d;", sql, id);
-    }else strcpy(query, "DELETE FROM TIME;");
+        sqlQuery(db, query, callback);
+    }
+    if(flag){
+        sqlQuery(db, "DELETE FROM TIME;", callback);
+    }
+        
     
     
-    sqlQuery(db, query, callback);
 
 }

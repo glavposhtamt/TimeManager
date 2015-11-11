@@ -26,11 +26,11 @@ void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
                     "MESSAGE  CHAR(100)        NOT NULL," \
                     "STATUS   INT              DEFAULT 0 );";
     
-    char * task = "CREATE TABLE IF NOT EXISTS TASK ("  \
+  char * task = "CREATE TABLE IF NOT EXISTS TASK ("  \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                     "TIMEID   INTEGER          NOT NULL," \
                     "START    datetime         NOT NULL," \
-                    "STOP     datetime         NOT NULL);";
+                    "STOP     datetime           );";
 
    sqlQuery(db, time, callback);    
    sqlQuery(db, task, callback);
@@ -59,16 +59,45 @@ void selectAll(int flag, sqlite3 * db, int (* callback)(void *, int, char **, ch
 
 void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){    
     if(!flag && id && id > 0){
-        char query[124];
-        char * sql = "DELETE from TIME where ID =";
-        sprintf(query, "%s %d;", sql, id);
+        char query[64];
+        
+        sprintf(query, "DELETE FROM TIME WHERE ID = %d;", id);
+        sqlQuery(db, query, callback);
+        
+        sprintf(query, "DELETE FROM TASK WHERE TIMEID = %d;", id);
         sqlQuery(db, query, callback);
     }
     if(flag){
-        sqlQuery(db, "DELETE FROM TIME;", callback);
+        sqlQuery(db, "DELETE FROM TIME; DELETE FROM TASK;", callback);
     }
-        
+}
+
+void updateStatusTask(int id, int status, sqlite3 * db, int (* callback)(void *, int, char **, char **)) {
     
+    /* 
+    *  int status, values:
+    *  0 - No active
+    *  1 - Active
+    */
     
+    status = status > 0 ? 1 : 0;
+    
+    char query[64];
+    sprintf(query, "UPDATE TIME SET STATUS = %d WHERE ID = %d;", status, id);
+    sqlQuery(db, query, callback);
+}
+    
+void taskToLastday(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)) {
+    char query[64];
+    
+    sprintf(query, "UPDATE TIME SET DATE = date('now') WHERE ID = %d;", id);
+    sqlQuery(db, query, callback);
+}
+
+void insertTimeRange(int id){
+    
+}
+
+void getTaskTime(int id){
 
 }

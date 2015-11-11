@@ -19,6 +19,7 @@ int main(int argc, char * argv[])
    int rc;
 
    /* Open database */
+    
    rc = sqlite3_open("time.db", &db);
    if( rc ){
       fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
@@ -29,19 +30,18 @@ int main(int argc, char * argv[])
     
     initTables(db, callback);
     
-    /* Парсинг флаг -m */
     if(argc > 1) addDoing(argv[1], db, callback);
     else printf("Введи аргументы!\n");
 
-    selectAll(0, db, callback);
+    //deleteTask(0, db, callback, 0);
     
-    deleteTask(0, db, callback, 1);
+    //updateStatusTask(12, 11, db, callback);
+    
+    //taskToLastday(12, db, callback);
+    
+    selectAll(1, db, callback);
     
     sqlite3_close(db);
-    
-    
-/*    sql = "UPDATE COMPANY set SALARY = 25000.00 where ID=1; " */
-    
     
 
    return 0;

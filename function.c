@@ -94,10 +94,17 @@ void taskToLastday(int id, sqlite3 * db, int (* callback)(void *, int, char **, 
     sqlQuery(db, query, callback);
 }
 
-void insertTimeRange(int id){
+void insertTimeRange(int startEnd, int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+    char query[64];
     
+    if(!startEnd) sprintf(query, "INSERT INTO TASK (TIMEID, START) VALUES (%d, datetime('now'));", id);
+    else sprintf(query, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d;", id);
+    sqlQuery(db, query, callback);
 }
 
-void getTaskTime(int id){
-
+void getTaskTime(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+    char query[64];
+    
+    sprintf(query, "SELECT START, STOP FROM TASK WHERE TIMEID = %d;", id);
+    sqlQuery(db, query, callback);
 }

@@ -3,9 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sqlite3.h> 
+#include <sqlite3.h>
+#include <stddef.h>
 
-extern void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char **, char **));
+extern void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char **, char **), void *);
 extern void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void selectAll(int flag, sqlite3 * db, int (* callback)(void *, int, char **, char **));

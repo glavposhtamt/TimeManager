@@ -15,12 +15,12 @@ static int callback(void * data, int argc, char **argv, char ** azColName){
 
 static int getData(void * data, int argc, char **argv, char ** azColName){
    int i;
-   fprintf(stderr, "%s: ", (const char *)data);
-   for(i = 0; i < argc; i++){
-      /*printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");*/
-      if(azColName[i] == "START") printf("%s", argv[i] ? argv[i] : "NULL");
-   }
-   printf("\n");
+   if(data != NULL)
+       for(i = 0; i < argc; i++)
+           if(strcmp(azColName[i], "START") == 0) {
+               strcpy((char *)data, argv[i] ? argv[i] : "NULL");
+               break;
+           }
    return 0;
 }
 
@@ -39,9 +39,9 @@ int main(int argc, char * argv[])
       fprintf(stderr, "Opened database successfully\n");
    }
     
-/*    initTables(db, callback);
+    initTables(db, callback);
     
-    if(argc > 1) addDoing(argv[1], db, callback);
+/*    if(argc > 1) addDoing(argv[1], db, callback);
     else printf("Введи аргументы!\n");
 
     deleteTask(0, db, callback, 0);
@@ -52,7 +52,7 @@ int main(int argc, char * argv[])
     
     selectAll(1, db, callback);*/
     
-    getTaskTime(1, db, callback);
+    getTaskTime(1, db, getData);
     
     sqlite3_close(db);
     

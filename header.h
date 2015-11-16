@@ -13,7 +13,7 @@ extern void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char 
 extern void updateStatusTask(int id, int status, sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void taskToLastday(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void getTaskTime(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **));
-extern void insertTimeRange(int startEnd, int id, sqlite3 * db, int (* callback)(void *, int, char **, char **));
+extern void insertTimeRange( int id, sqlite3 * db, int (* callback)(void *, int, char **, char **));
 
 #endif // HEADER
 

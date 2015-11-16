@@ -26,7 +26,7 @@ static int getData(void * data, int argc, char **argv, char ** azColName){
 
 int main(int argc, char * argv[])
 {
-   sqlite3 *db;
+   sqlite3 * db;
    int rc;
 
    /* Open database */

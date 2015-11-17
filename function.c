@@ -113,3 +113,11 @@ void getTaskTime(int id, sqlite3 * db, int (* callback)(void *, int, char **, ch
     if(start != NULL) printf("%s\n", start);
     free(start);
 }
+
+void parseDateTime(char * date) {
+    
+}
+
+double getPeriod(){
+    
+}

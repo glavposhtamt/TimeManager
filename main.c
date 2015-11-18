@@ -1,5 +1,5 @@
 /* Compile flag -lsqlite3 */
-/* cc -o time main.c function.c -g -Wall -lsqlite3 */
+/* cc -o time main.c function.c -g -Wall -lsqlite3 -D_XOPEN_SOURCE=600 */
 
 #include "header.h"
 
@@ -53,7 +53,7 @@ int main(int argc, char * argv[])
     selectAll(1, db, callback);*/
     
     getTaskTime(1, db, getData);
-    
+        
     sqlite3_close(db);
     
 

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sqlite3.h>
 #include <stddef.h>
+#include <time.h>
 
 extern void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char **, char **), void *);
 extern void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **));

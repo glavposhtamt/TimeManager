@@ -103,6 +103,18 @@ void insertTimeRange(int id, sqlite3 * db, int (* callback)(void *, int, char **
     sqlQuery(db, query, callback, NULL); 
 }
 
+double getPeriod(char * date){
+    struct tm tm;
+    time_t timeStampStart, current_time;
+    
+    strptime(date, "%Y-%m-%d %H:%M:%S", &tm);
+    
+    timeStampStart = mktime(&tm);
+    current_time = time(NULL);
+        
+    return difftime(current_time, timeStampStart);
+}
+
 void getTaskTime(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
     char query[64];
     char * start = (char *)malloc(sizeof(char) * 32);
@@ -110,14 +122,10 @@ void getTaskTime(int id, sqlite3 * db, int (* callback)(void *, int, char **, ch
     sprintf(query, "SELECT START, STOP FROM TASK WHERE TIMEID = %d;", id);
     sqlQuery(db, query, callback, (void *)start);
     
-    if(start != NULL) printf("%s\n", start);
+    if(start != NULL) { 
+        printf("%s\n", start); 
+        printf("%0.2lf\n", (getPeriod(start) / 60) / 60);
+    }
+    
     free(start);
-}
-
-void parseDateTime(char * date) {
-    
-}
-
-double getPeriod(){
-    
 }

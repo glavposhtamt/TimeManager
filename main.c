@@ -15,7 +15,7 @@ static int callback(void * data, int argc, char **argv, char ** azColName){
 
 static int getData(void * data, int argc, char **argv, char ** azColName){
    int i;
-   if(data != NULL)
+   if(data != NULL && (strcmp(data, "NULL") == 0))
        for(i = 0; i < argc; i++)
            if(strcmp(azColName[i], "START") == 0) {
                strcpy((char *)data, argv[i] ? argv[i] : "NULL");

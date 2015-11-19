@@ -115,17 +115,19 @@ double getPeriod(char * date){
     return difftime(current_time, timeStampStart);
 }
 
+
 void getTaskTime(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
     char query[64];
     char * start = (char *)malloc(sizeof(char) * 32);
+    strcpy(start, "NULL");
     
     sprintf(query, "SELECT START, STOP FROM TASK WHERE TIMEID = %d;", id);
     sqlQuery(db, query, callback, (void *)start);
     
-    if(start != NULL) { 
+    if(start != NULL && (strcmp(start, "NULL") != 0)) { 
         printf("%s\n", start); 
         printf("%0.2lf\n", (getPeriod(start) / 60) / 60);
-    }
+    } else printf("0.00\n");
     
     free(start);
 }

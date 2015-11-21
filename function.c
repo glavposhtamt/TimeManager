@@ -1,6 +1,5 @@
 #include "header.h"
 
-
 void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char **, char **), void * data){
     int rc;
     char * zErrMsg = 0;
@@ -14,6 +13,33 @@ void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char
         fprintf(stdout, "Operation done successfully\n");
     }
     
+}
+
+values * selectFromTable( sqlite3 * db, const char * sql ){
+    int rc, nrows, ncols;
+    char ** result, * errmsg;
+    values * val = malloc(sizeof(values));
+    
+    rc = sqlite3_get_table(db, sql, &result, &nrows, &ncols, &errmsg);
+    
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", errmsg);
+        sqlite3_free(errmsg);
+        sqlite3_free_table(result);
+        exit(1);
+    }else{
+        
+        val->result = result;
+        val->columns = ncols;
+        val->rows = nrows;
+        
+        return val;        
+    }    
+}
+
+void freeStructValues(values * val){
+    sqlite3_free_table(val->result);
+    free(val);
 }
 
 /*Продумать открытие/закрытие соединения*/
@@ -116,18 +142,15 @@ double getPeriod(char * date){
 }
 
 
-void getTaskTime(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    char query[64];
-    char * start = (char *)malloc(sizeof(char) * 32);
-    strcpy(start, "NULL");
+void getTaskTime(int id, sqlite3 * db, char * sql){
+    int i;
+    values * val = selectFromTable(db, "SELECT * FROM TASK");
     
-    sprintf(query, "SELECT START, STOP FROM TASK WHERE TIMEID = %d;", id);
-    sqlQuery(db, query, callback, (void *)start);
+    int count = val->columns * val->rows + val->columns;
     
-    if(start != NULL && (strcmp(start, "NULL") != 0)) { 
-        printf("%s\n", start); 
-        printf("%0.2lf\n", (getPeriod(start) / 60) / 60);
-    } else printf("0.00\n");
+    for (i = val->columns; i < count; i++)
+        printf("%s\t%p\n", val->result[i], val->result[i]);
     
-    free(start);
+    freeStructValues(val);
+    
 }

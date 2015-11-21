@@ -13,16 +13,6 @@ static int callback(void * data, int argc, char **argv, char ** azColName){
    return 0;
 }
 
-static int getData(void * data, int argc, char **argv, char ** azColName){
-   int i;
-   if(data != NULL && (strcmp(data, "NULL") == 0))
-       for(i = 0; i < argc; i++)
-           if(strcmp(azColName[i], "START") == 0) {
-               strcpy((char *)data, argv[i] ? argv[i] : "NULL");
-               break;
-           }
-   return 0;
-}
 
 int main(int argc, char * argv[])
 {
@@ -41,6 +31,8 @@ int main(int argc, char * argv[])
     
     initTables(db, callback);
     
+    getTaskTime(1, db, "SELECT * FROM TASK;");
+    
 /*    if(argc > 1) addDoing(argv[1], db, callback);
     else printf("Введи аргументы!\n");
 
@@ -52,7 +44,7 @@ int main(int argc, char * argv[])
     
     selectAll(1, db, callback);*/
     
-    getTaskTime(1, db, getData);
+    //getTaskTime(1, db, getData);
         
     sqlite3_close(db);
     

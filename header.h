@@ -7,7 +7,8 @@
 #include <stddef.h>
 #include <time.h>
 
-#define STRUCT_COUNT 24
+#define START_COLUMN_NUMBER 3
+#define STOP_COLUMN_NUMBER 4
 
 extern void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char **, char **), void *);
 extern void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **));

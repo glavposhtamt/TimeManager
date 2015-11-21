@@ -60,8 +60,6 @@ void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
    sqlQuery(db, time, callback, NULL);    
    sqlQuery(db, task, callback, NULL);
     
-   
-    
 }
 
 void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
@@ -123,27 +121,29 @@ void insertTimeRange(int id, sqlite3 * db, int (* callback)(void *, int, char **
     char query[64];
     
     if(id < 0) id *= -1;
-    
+    //Бажочек
     if(!id) sprintf(query, "INSERT INTO TASK (TIMEID, START) VALUES (%d, datetime('now'));", id);
     else sprintf(query, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d;", id);
     sqlQuery(db, query, callback, NULL); 
 }
 
-double getPeriod(char * date){
-    struct tm tm;
-    time_t timeStampStart, current_time;
-    
-    strptime(date, "%Y-%m-%d %H:%M:%S", &tm);
-    
-    timeStampStart = mktime(&tm);
-    current_time = time(NULL);
+double getPeriod(char * dateStart, char * dateStop){
+    struct tm tmStart, tmStop;
+    time_t timeStampStart, timeStampStop;
         
-    return difftime(current_time, timeStampStart);
+    strptime(dateStart, "%Y-%m-%d %H:%M:%S", &tmStart);
+    strptime(dateStop, "%Y-%m-%d %H:%M:%S", &tmStop);
+
+    timeStampStart = mktime(&tmStart);
+    timeStampStop = mktime(&tmStop);
+        
+    return difftime(timeStampStop, timeStampStart);
 }
 
 
 void getTaskTime(char * sql, int id, sqlite3 * db){
-    int i;
+    int i, j, proxy;
+    double seconds = 0.0;
     char query[64];
     
     sprintf(query, sql, id);
@@ -152,9 +152,17 @@ void getTaskTime(char * sql, int id, sqlite3 * db){
     
     int count = val->columns * val->rows + val->columns;
     
-    for (i = val->columns; i < count; i++)
-        printf("%s\t%p\n", val->result[i], val->result[i]);
+    for (i = val->columns, j = 1; i < count; i++) {
+        if(j == START_COLUMN_NUMBER) proxy = i;
+        if(j == STOP_COLUMN_NUMBER && val->result[i] != NULL) {
+  
+            seconds += getPeriod(val->result[proxy], val->result[i]);
+        }    
+        if(j == val->columns) j = 1;
+        else j++;
+    }
     
-    freeStructValues(val);
+    printf("%.2lf\n",  seconds / 60 / 60 );
     
+    freeStructValues(val);   
 }

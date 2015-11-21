@@ -18,7 +18,7 @@ int main(int argc, char * argv[])
 {
    sqlite3 * db;
    int rc;
-
+   
    /* Open database */
     
    rc = sqlite3_open("time.db", &db);

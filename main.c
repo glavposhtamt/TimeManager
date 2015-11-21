@@ -31,7 +31,7 @@ int main(int argc, char * argv[])
     
     initTables(db, callback);
     
-    getTaskTime(1, db, "SELECT * FROM TASK;");
+    getTaskTime("SELECT * FROM TASK WHERE TIMEID = %d;", 1, db);
     
 /*    if(argc > 1) addDoing(argv[1], db, callback);
     else printf("Введи аргументы!\n");

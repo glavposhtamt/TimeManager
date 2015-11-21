@@ -15,7 +15,7 @@ void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char
     
 }
 
-values * selectFromTable( sqlite3 * db, const char * sql ){
+values * selectFromTableById( sqlite3 * db, const char * sql ){
     int rc, nrows, ncols;
     char ** result, * errmsg;
     values * val = malloc(sizeof(values));
@@ -142,9 +142,13 @@ double getPeriod(char * date){
 }
 
 
-void getTaskTime(int id, sqlite3 * db, char * sql){
+void getTaskTime(char * sql, int id, sqlite3 * db){
     int i;
-    values * val = selectFromTable(db, "SELECT * FROM TASK");
+    char query[64];
+    
+    sprintf(query, sql, id);
+    
+    values * val = selectFromTableById(db, query);
     
     int count = val->columns * val->rows + val->columns;
     

@@ -121,9 +121,9 @@ void insertTimeRange(int id, sqlite3 * db, int (* callback)(void *, int, char **
     char query[64];
     
     if(id < 0) id *= -1;
-    //Бажочек
+    
     if(!id) sprintf(query, "INSERT INTO TASK (TIMEID, START) VALUES (%d, datetime('now'));", id);
-    else sprintf(query, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d;", id);
+    else sprintf(query, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d AND STOP IS NULL;", id);
     sqlQuery(db, query, callback, NULL); 
 }
 

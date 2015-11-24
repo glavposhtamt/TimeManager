@@ -14,8 +14,7 @@ static int callback(void * data, int argc, char **argv, char ** azColName){
 }
 
 
-int main(int argc, char * argv[])
-{
+int main(int argc, char * argv[]){
    sqlite3 * db;
    int rc;
    
@@ -25,30 +24,25 @@ int main(int argc, char * argv[])
    if( rc ){
       fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
       exit(0);
-   }else{
-      fprintf(stderr, "Opened database successfully\n");
    }
-    
+
     initTables(db, callback);
     
     getTaskTime("SELECT * FROM TASK WHERE TIMEID = %d;", 1, db);
     
-/*    if(argc > 1) addDoing(argv[1], db, callback);
+    if(argc > 1) addDoing(argv[1], db, callback);
     else printf("Введи аргументы!\n");
 
-    deleteTask(0, db, callback, 0);
+/*  deleteTask(0, db, callback, 0);
     
     updateStatusTask(12, 11, db, callback);
     
     taskToLastday(12, db, callback);
     
     selectAll(1, db, callback);*/
-    
-    //getTaskTime(1, db, getData);
-        
+         
     sqlite3_close(db);
     
-
    return 0;
 }
 

@@ -9,10 +9,7 @@ void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
-    }else{
-        fprintf(stdout, "Operation done successfully\n");
     }
-    
 }
 
 values * selectFromTableById( sqlite3 * db, const char * sql ){
@@ -165,4 +162,8 @@ void getTaskTime(char * sql, int id, sqlite3 * db){
     printf("%.2lf\n",  seconds / 60 / 60 );
     
     freeStructValues(val);   
+}
+
+void init(){
+    
 }

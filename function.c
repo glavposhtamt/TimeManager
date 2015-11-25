@@ -39,7 +39,6 @@ void freeStructValues(values * val){
     free(val);
 }
 
-/*Продумать открытие/закрытие соединения*/
 
 void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
    char * time = "CREATE TABLE IF NOT EXISTS TIME (" \

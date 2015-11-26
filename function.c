@@ -111,12 +111,16 @@ void taskToLastday(int id, sqlite3 * db, int (* callback)(void *, int, char **, 
     sqlQuery(db, query, callback, NULL); 
 }
 
-void insertTimeRange(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    char query[64];
+void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){
+    char query[128];
     
-    if(id < 0) id *= -1;
+    /*
+     * int flag:
+     * flag == FALSE - INSERT
+     * flag == TRUE  - UPDATE
+     */ 
     
-    if(!id) sprintf(query, "INSERT INTO TASK (TIMEID, START) VALUES (%d, datetime('now'));", id);
+    if(!flag) sprintf(query, "INSERT INTO TASK (TIMEID, START) VALUES (%d, datetime('now'));", id);
     else sprintf(query, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d AND STOP IS NULL;", id);
     sqlQuery(db, query, callback, NULL); 
 }
@@ -136,7 +140,6 @@ double getPeriod(char * dateStart, char * dateStop){
 
 
 double getTaskTime(char * sql, int id, sqlite3 * db){
-    //модифицировать
     int i, j, proxy;
     double seconds = 0.0;
     char query[64];
@@ -148,8 +151,8 @@ double getTaskTime(char * sql, int id, sqlite3 * db){
     int count = val->columns * val->rows + val->columns;
     
     for (i = val->columns, j = 1; i < count; i++) {
-        if(j == START_COLUMN_NUMBER) proxy = i;
-        if(j == STOP_COLUMN_NUMBER && val->result[i] != NULL) {
+        if(j == 1) proxy = i;
+        if(j == 2 && val->result[i] != NULL) {
   
             seconds += getPeriod(val->result[proxy], val->result[i]);
         }    
@@ -179,7 +182,7 @@ void printTable(char * sql, int id, sqlite3 * db){
         if(j == 1) timeId = atoi(val->result[i]);
 
         if(j == val->columns) {
-            seconds = getTaskTime("select * from TASK where TIMEID = %d;", timeId, db);
+            seconds = getTaskTime("select START, STOP from TASK where TIMEID = %d;", timeId, db);
             printf("%.2lf\n",  seconds / 60 / 60 );
             j = 1;
         } else j++;

@@ -30,6 +30,8 @@ int main(int argc, char * argv[]){
         if(!strcmp(MESSAGE, argv[1])) addDoing(argv[2], db, callback);
         else if(!strcmp(REMOVE, argv[1])) deleteTask(atoi(argv[2]), db, callback, 0);
         else if(!strcmp(LAST_DAY, argv[1])) taskToLastday(atoi(argv[2]), db, callback);
+        else if(!strcmp(START_TIME, argv[1])) startStop(atoi(argv[2]), db, callback, 0);
+        else if(!strcmp(STOP_TIME, argv[1])) startStop(atoi(argv[2]), db, callback, 1);
         else printf("Неверно введена команда!\n");
     }
     else if(argc == 2) { 

@@ -12,7 +12,7 @@ void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char
     }
 }
 
-values * selectFromTableById( sqlite3 * db, const char * sql ){
+values * selectFromTable( sqlite3 * db, const char * sql ){
     int rc, nrows, ncols;
     char ** result, * errmsg;
     values * val = malloc(sizeof(values));
@@ -66,14 +66,6 @@ void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, c
             
     sqlQuery(db, query, callback, NULL);    
 
-}
-
-
-void selectAll(int flag, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    const char * sql = flag ? "SELECT * FROM TIME WHERE date = date('now')" : "SELECT * from TIME;";
-    
-    sqlQuery(db, sql, callback, NULL); 
-    
 }
 
 void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){    
@@ -143,14 +135,15 @@ double getPeriod(char * dateStart, char * dateStop){
 }
 
 
-void getTaskTime(char * sql, int id, sqlite3 * db){
+double getTaskTime(char * sql, int id, sqlite3 * db){
+    //модифицировать
     int i, j, proxy;
     double seconds = 0.0;
     char query[64];
     
     sprintf(query, sql, id);
     
-    values * val = selectFromTableById(db, query);
+    values * val = selectFromTable(db, query);
     
     int count = val->columns * val->rows + val->columns;
     
@@ -164,15 +157,33 @@ void getTaskTime(char * sql, int id, sqlite3 * db){
         else j++;
     }
     
-    printf("%.2lf\n",  seconds / 60 / 60 );
+    freeStructValues(val); 
+   
+    return seconds;
+}
+
+void printTable(char * sql, int id, sqlite3 * db){
+    int i, j, timeId;
+    double seconds = 0.0;
+    values * val;
+    if(id > 0) {
+        char query[64]; 
+        sprintf(query, sql, id);
+        val = selectFromTable(db, query);
+    } else val = selectFromTable(db, sql);
+
+    int count = val->columns * val->rows + val->columns;
     
+    for (i = val->columns, j = 1; i < count; i++) {
+        printf("%s\t", val->result[i]);
+        if(j == 1) timeId = atoi(val->result[i]);
+
+        if(j == val->columns) {
+            seconds = getTaskTime("select * from TASK where TIMEID = %d;", timeId, db);
+            printf("%.2lf\n",  seconds / 60 / 60 );
+            j = 1;
+        } else j++;
+    }
+
     freeStructValues(val);   
-}
-
-void info(){
-    
-}
-
-void outputFormat(){
-    
 }

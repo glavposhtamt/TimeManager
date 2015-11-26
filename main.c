@@ -1,15 +1,11 @@
-/* Compile flag -lsqlite3 */
 /* cc -o time main.c function.c -g -Wall -lsqlite3 -D_XOPEN_SOURCE=600 */
 
 #include "header.h"
 
 static int callback(void * data, int argc, char **argv, char ** azColName){
-   int i;
-   fprintf(stderr, "%s: ", (const char *)data);
-   for(i = 0; i < argc; i++){
-      printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-   }
-   printf("\n");
+
+   if(data != NULL) fprintf(stderr, "%s: ", (const char *)data);
+   
    return 0;
 }
 
@@ -38,13 +34,13 @@ int main(int argc, char * argv[]){
     }
     else if(argc == 2) { 
         if(!strcmp(CLEAN, argv[1])) deleteTask(0, db, callback, 1);
+        if(!strcmp(SHOW_ALL, argv[1])) printTable("select ID, MESSAGE from TIME;", 0, db);
         else printf("Неверно введена команда!\n");
     } 
     else printf("Пользуйся командами:...\n");
 
-    //getTaskTime("SELECT * FROM TASK WHERE TIMEID = %d;", 1, db);    
     //updateStatusTask(12, 11, db, callback);
-    //selectAll(1, db, callback);*/
+
 
    /* Close database */
 

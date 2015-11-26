@@ -45,7 +45,7 @@ void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                     "DATE     date             NOT NULL," \
                     "MESSAGE  CHAR(100)        NOT NULL," \
-                    "STATUS   INT              DEFAULT 0 );";
+                    "STATUS   INTEGER          DEFAULT 0);";
     
   char * task = "CREATE TABLE IF NOT EXISTS TASK ("  \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
@@ -89,21 +89,6 @@ void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, cha
     }
 }
 
-void updateStatusTask(int id, int status, sqlite3 * db, int (* callback)(void *, int, char **, char **)) {
-    
-    /* 
-     *  int status, values:
-     *  0 - No active
-     *  1 - Active
-     */
-    
-    status = status > 0 ? 1 : 0;
-    
-    char query[64];
-    sprintf(query, "UPDATE TIME SET STATUS = %d WHERE ID = %d;", status, id);
-    sqlQuery(db, query, callback, NULL); 
-}
-    
 void taskToLastday(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)) {
     char query[64];
     
@@ -111,9 +96,18 @@ void taskToLastday(int id, sqlite3 * db, int (* callback)(void *, int, char **, 
     sqlQuery(db, query, callback, NULL); 
 }
 
-void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){
+void updateStatus(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+    
+}
+
+void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
     char query[128];
     
+    sprintf(query, "select count(*) as count from TASK where TIMEID = %d AND STOP IS NULL;", id);
+    
+    values * val = selectFromTable(db, query);
+    int flag = atoi(val->result[1]);
+
     /*
      * int flag:
      * flag == FALSE - INSERT
@@ -121,8 +115,11 @@ void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char
      */ 
     
     if(!flag) sprintf(query, "INSERT INTO TASK (TIMEID, START) VALUES (%d, datetime('now'));", id);
-    else sprintf(query, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d AND STOP IS NULL;", id);
-    sqlQuery(db, query, callback, NULL); 
+    if(flag) sprintf(query, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d AND STOP IS NULL;", id);
+
+    sqlQuery(db, query, callback, NULL);
+
+    freeStructValues(val);
 }
 
 double getPeriod(char * dateStart, char * dateStop){
@@ -169,8 +166,9 @@ void printTable(char * sql, int id, sqlite3 * db){
     int i, j, timeId;
     double seconds = 0.0;
     values * val;
+    char query[128];
+
     if(id > 0) {
-        char query[64]; 
         sprintf(query, sql, id);
         val = selectFromTable(db, query);
     } else val = selectFromTable(db, sql);
@@ -183,7 +181,7 @@ void printTable(char * sql, int id, sqlite3 * db){
 
         if(j == val->columns) {
             seconds = getTaskTime("select START, STOP from TASK where TIMEID = %d;", timeId, db);
-            printf("%.2lf\n",  seconds / 60 / 60 );
+            printf("%.2lf\n",  (seconds / 60) / 60 );
             j = 1;
         } else j++;
     }

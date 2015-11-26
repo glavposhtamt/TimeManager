@@ -14,16 +14,14 @@
 #define CLEAN         "clean"
 #define LAST_DAY      "ld"
 #define SHOW_ALL      "all"
-#define START_TIME    "start"
-#define STOP_TIME     "stop"
+#define CHANGE        "ch"
 
 extern void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int);
-extern void updateStatusTask(int id, int status, sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void taskToLastday(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **));
-extern void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int);
-extern void printTable(char * sql, int id, sqlite3 * db);
+extern void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **));
+extern void printTable(char *, int, sqlite3 * db);
 
 typedef struct Query {
    char ** result;

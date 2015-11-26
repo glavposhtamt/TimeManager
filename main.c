@@ -24,25 +24,21 @@ int main(int argc, char * argv[]){
 
     initTables(db, callback);
     
-    /* Commands */
+    /* Commands */   
 
     if(argc == 3){
         if(!strcmp(MESSAGE, argv[1])) addDoing(argv[2], db, callback);
         else if(!strcmp(REMOVE, argv[1])) deleteTask(atoi(argv[2]), db, callback, 0);
         else if(!strcmp(LAST_DAY, argv[1])) taskToLastday(atoi(argv[2]), db, callback);
-        else if(!strcmp(START_TIME, argv[1])) startStop(atoi(argv[2]), db, callback, 0);
-        else if(!strcmp(STOP_TIME, argv[1])) startStop(atoi(argv[2]), db, callback, 1);
+        else if(!strcmp(CHANGE, argv[1])) startStop(atoi(argv[2]), db, callback);
         else printf("Неверно введена команда!\n");
     }
     else if(argc == 2) { 
         if(!strcmp(CLEAN, argv[1])) deleteTask(0, db, callback, 1);
-        if(!strcmp(SHOW_ALL, argv[1])) printTable("select ID, MESSAGE from TIME;", 0, db);
+        else if(!strcmp(SHOW_ALL, argv[1])) printTable("select ID, MESSAGE from TIME;", 0, db);
         else printf("Неверно введена команда!\n");
     } 
     else printf("Пользуйся командами:...\n");
-
-    //updateStatusTask(12, 11, db, callback);
-
 
    /* Close database */
 

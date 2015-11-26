@@ -28,19 +28,26 @@ int main(int argc, char * argv[]){
 
     initTables(db, callback);
     
-    getTaskTime("SELECT * FROM TASK WHERE TIMEID = %d;", 1, db);
-    
-    if(argc > 1) addDoing(argv[1], db, callback);
-    else printf("Введи аргументы!\n");
+    /* Commands */
 
-/*  deleteTask(0, db, callback, 0);
-    
-    updateStatusTask(12, 11, db, callback);
-    
-    taskToLastday(12, db, callback);
-    
-    selectAll(1, db, callback);*/
-         
+    if(argc == 3){
+        if(!strcmp(MESSAGE, argv[1])) addDoing(argv[2], db, callback);
+        else if(!strcmp(REMOVE, argv[1])) deleteTask(atoi(argv[2]), db, callback, 0);
+        else if(!strcmp(LAST_DAY, argv[1])) taskToLastday(atoi(argv[2]), db, callback);
+        else printf("Неверно введена команда!\n");
+    }
+    else if(argc == 2) { 
+        if(!strcmp(CLEAN, argv[1])) deleteTask(0, db, callback, 1);
+        else printf("Неверно введена команда!\n");
+    } 
+    else printf("Пользуйся командами:...\n");
+
+    //getTaskTime("SELECT * FROM TASK WHERE TIMEID = %d;", 1, db);    
+    //updateStatusTask(12, 11, db, callback);
+    //selectAll(1, db, callback);*/
+
+   /* Close database */
+
     sqlite3_close(db);
     
    return 0;

@@ -77,7 +77,13 @@ void selectAll(int flag, sqlite3 * db, int (* callback)(void *, int, char **, ch
 }
 
 void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){    
-    if(!flag && id && id > 0){
+   /*
+    * int flag:
+    * 0 - remove row
+    * 1 - remove all
+    */ 
+    
+    if(!flag && id > 0){
         char query[64];
         
         sprintf(query, "DELETE FROM TIME WHERE ID = %d;", id);
@@ -94,10 +100,10 @@ void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, cha
 void updateStatusTask(int id, int status, sqlite3 * db, int (* callback)(void *, int, char **, char **)) {
     
     /* 
-    *  int status, values:
-    *  0 - No active
-    *  1 - Active
-    */
+     *  int status, values:
+     *  0 - No active
+     *  1 - Active
+     */
     
     status = status > 0 ? 1 : 0;
     
@@ -163,6 +169,10 @@ void getTaskTime(char * sql, int id, sqlite3 * db){
     freeStructValues(val);   
 }
 
-void init(){
+void info(){
+    
+}
+
+void outputFormat(){
     
 }

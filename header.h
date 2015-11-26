@@ -8,9 +8,15 @@
 #include <time.h>
 
 #define START_COLUMN_NUMBER 3
-#define STOP_COLUMN_NUMBER 4
+#define STOP_COLUMN_NUMBER  4
 
-extern void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char **, char **), void *);
+/* Commands */
+
+#define MESSAGE  "add"
+#define REMOVE   "rm"
+#define CLEAN    "clean"
+#define LAST_DAY "ld"
+
 extern void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void selectAll(int flag, sqlite3 * db, int (* callback)(void *, int, char **, char **));

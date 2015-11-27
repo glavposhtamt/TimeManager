@@ -30,5 +30,11 @@ typedef struct Query {
    int rows;
 } values;
 
+typedef struct Clock {
+    int sec;
+    int min;
+    int hours;
+} cl;
+
 #endif // HEADER
 

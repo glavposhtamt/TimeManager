@@ -174,6 +174,19 @@ double getTaskTime(char * sql, int id, sqlite3 * db){
     return seconds;
 }
 
+cl secToTime(double seconds){
+    long s = (long)seconds;
+    int allMin;
+    cl hms;
+
+    hms.sec = s >= 60 ? s % 60 : s;
+    allMin = s / 60;
+    hms.min = allMin >= 60 ? allMin % 60 : allMin;
+    hms.hours = allMin / 60;    
+
+    return hms;
+}
+
 void printTable(char * sql, int id, sqlite3 * db){
     int i, j, timeId;
     double seconds = 0.0;
@@ -200,7 +213,8 @@ void printTable(char * sql, int id, sqlite3 * db){
             j = 1;
         } else {
             seconds = getTaskTime("select START, STOP from TASK where TIMEID = %d;", timeId, db);
-            printf("%.2lf\t",  (seconds / 60) / 60 );
+            cl hms = secToTime(seconds);
+            printf("%.2d:%.2d:%.2d\t", hms.hours, hms.min, hms.sec);
             printf("%s\t", atoi(val->result[i]) ? "Start" : "Pause");
             j++;
         }
@@ -208,3 +222,4 @@ void printTable(char * sql, int id, sqlite3 * db){
 
     freeStructValues(val);   
 }
+

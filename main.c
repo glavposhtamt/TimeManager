@@ -38,6 +38,7 @@ int main(int argc, char * argv[]){
         else if(!strcmp(SHOW_ALL, argv[1])) printTable("select ID, STATUS, MESSAGE from TIME;", 0, db);
         else printf("Неверно введена команда!\n");
     } 
+    else if(argc == 1) printTable("select ID, STATUS, MESSAGE from TIME WHERE date = date('now');", 0, db);
     else printf("Пользуйся командами:...\n");
 
    /* Close database */

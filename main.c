@@ -23,7 +23,18 @@ int main(int argc, char * argv[]){
    }
 
     initTables(db, callback);
-    
+
+    /* Info */
+
+    const char * info = "Пользуйся командами:\n"\
+                        "%s ... - Добавить задачу.\n"\
+                        "%s [id] - Удалить задачу.\n"\
+                        "%s [id] - Перенести на следующий день.\n"\
+                        "%s [id] - start/pause.\n"\
+                        "%s - Обнуление записей\n"\
+                        "%s - Вывести все задачи за все дни.\n"\
+                        "%s - Вывести это сообщение\n";
+
     /* Commands */   
 
     if(argc == 3){
@@ -36,10 +47,11 @@ int main(int argc, char * argv[]){
     else if(argc == 2) { 
         if(!strcmp(CLEAN, argv[1])) deleteTask(0, db, callback, 1);
         else if(!strcmp(SHOW_ALL, argv[1])) printTable("select ID, STATUS, MESSAGE from TIME;", 0, db);
+        else if(!strcmp(INFO, argv[1])) printf(info, MESSAGE, REMOVE, LAST_DAY, CHANGE, CLEAN, SHOW_ALL, INFO);
         else printf("Неверно введена команда!\n");
     } 
     else if(argc == 1) printTable("select ID, STATUS, MESSAGE from TIME WHERE date = date('now');", 0, db);
-    else printf("Пользуйся командами:...\n");
+    else printf(info, MESSAGE, REMOVE, LAST_DAY, CHANGE, CLEAN, SHOW_ALL, INFO);
 
    /* Close database */
 

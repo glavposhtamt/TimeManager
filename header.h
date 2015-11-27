@@ -15,6 +15,7 @@
 #define LAST_DAY      "ld"
 #define SHOW_ALL      "all"
 #define CHANGE        "ch"
+#define INFO          "info"
 
 extern void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, char **));

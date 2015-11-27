@@ -35,7 +35,7 @@ int main(int argc, char * argv[]){
     }
     else if(argc == 2) { 
         if(!strcmp(CLEAN, argv[1])) deleteTask(0, db, callback, 1);
-        else if(!strcmp(SHOW_ALL, argv[1])) printTable("select ID, MESSAGE from TIME;", 0, db);
+        else if(!strcmp(SHOW_ALL, argv[1])) printTable("select ID, STATUS, MESSAGE from TIME;", 0, db);
         else printf("Неверно введена команда!\n");
     } 
     else printf("Пользуйся командами:...\n");

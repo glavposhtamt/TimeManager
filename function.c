@@ -96,8 +96,18 @@ void taskToLastday(int id, sqlite3 * db, int (* callback)(void *, int, char **, 
     sqlQuery(db, query, callback, NULL); 
 }
 
-void updateStatus(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+void updateStatus(int id, int status, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
     
+    /*
+     * int status:
+     * status == 1 - active
+     * status == 0 - no active
+     */
+
+    char query[64];
+    
+    sprintf(query, "UPDATE TIME SET STATUS = %d WHERE ID = %d;", status,  id);
+    sqlQuery(db, query, callback, NULL); 
 }
 
 void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
@@ -107,6 +117,8 @@ void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char
     
     values * val = selectFromTable(db, query);
     int flag = atoi(val->result[1]);
+
+    updateStatus(id, !flag, db, callback);
 
     /*
      * int flag:
@@ -176,14 +188,22 @@ void printTable(char * sql, int id, sqlite3 * db){
     int count = val->columns * val->rows + val->columns;
     
     for (i = val->columns, j = 1; i < count; i++) {
-        printf("%s\t", val->result[i]);
-        if(j == 1) timeId = atoi(val->result[i]);
+        if(j == 1) {
+          timeId = atoi(val->result[i]);
+          printf("[%d]\t", timeId);
+          j++;
+          continue;
+        } 
 
         if(j == val->columns) {
-            seconds = getTaskTime("select START, STOP from TASK where TIMEID = %d;", timeId, db);
-            printf("%.2lf\n",  (seconds / 60) / 60 );
+            printf("%s\n", val->result[i]);
             j = 1;
-        } else j++;
+        } else {
+            seconds = getTaskTime("select START, STOP from TASK where TIMEID = %d;", timeId, db);
+            printf("%.2lf\t",  (seconds / 60) / 60 );
+            printf("%s\t", atoi(val->result[i]) ? "Start" : "Pause");
+            j++;
+        }
     }
 
     freeStructValues(val);   

@@ -40,12 +40,37 @@ void sqlQuery(sqlite3 * db, int (* callback)(void *, int, char **, char **), cha
     }
 }
 
-values * selectFromTable( sqlite3 * db, const char * sql ){
-    int rc, nrows, ncols;
-    char ** result, * errmsg;
+values * selectFromTable(sqlite3 * db, char * fmt, ...){
+    va_list ap;
+    int rc, nrows, ncols, d, count = 0;
+    char ** result, * errmsg, c, *s, query[256], *sql = fmt;
     values * val = malloc(sizeof(values));
     
-    rc = sqlite3_get_table(db, sql, &result, &nrows, &ncols, &errmsg);
+    va_start(ap, fmt);
+    while (*fmt)
+       if(*fmt++ == '%') {
+           switch (*fmt) {
+               case 's':              /* string */
+                   s = va_arg(ap, char *);
+                   sprintf(query, sql, s);
+                   break;
+               case 'd':              /* int */
+                   d = va_arg(ap, int);
+                   sprintf(query, sql, d);
+                   break;
+               case 'c':              /* char */
+                   c = (char) va_arg(ap, int);
+                   sprintf(query, sql, c);
+                   break;
+            }
+            ++count;
+            break;
+       }
+    
+    va_end(ap);
+    
+    if(count) rc = sqlite3_get_table(db, query, &result, &nrows, &ncols, &errmsg);
+    else rc = sqlite3_get_table(db, sql, &result, &nrows, &ncols, &errmsg);
     
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", errmsg);
@@ -126,11 +151,9 @@ void updateStatus(int id, int status, sqlite3 * db, int (* callback)(void *, int
 }
 
 void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    char query[128];
     
-    sprintf(query, "select count(*) as count from TASK where TIMEID = %d AND STOP IS NULL;", id);
+    values * val = selectFromTable(db, "select count(*) as count from TASK where TIMEID = %d AND STOP IS NULL;", id);
     
-    values * val = selectFromTable(db, query);
     int flag = atoi(val->result[1]);
 
     updateStatus(id, !flag, db, callback);
@@ -165,12 +188,9 @@ double getPeriod(char * dateStart, char * dateStop){
 double getTaskTime(char * sql, int id, sqlite3 * db){
     int i, j, proxy;
     double seconds = 0.0;
-    char query[64];
     
-    sprintf(query, sql, id);
-    
-    values * val = selectFromTable(db, query);
-    
+    values * val = selectFromTable(db, sql, id);
+        
     int count = val->columns * val->rows + val->columns;
     
     for (i = val->columns, j = 1; i < count; i++) {
@@ -205,11 +225,9 @@ void printTable(char * sql, int id, sqlite3 * db){
     int i, j, timeId;
     double seconds = 0.0;
     values * val;
-    char query[128];
 
     if(id > 0) {
-        sprintf(query, sql, id);
-        val = selectFromTable(db, query);
+        val = selectFromTable(db, sql, id);
     } else val = selectFromTable(db, sql);
 
     int count = val->columns * val->rows + val->columns;

@@ -20,9 +20,9 @@
 
 extern void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void sqlQuery(sqlite3 * db, int (* callback)(void *, int, char **, char **), char * fmt, ... );
-extern void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int);
-extern void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **));
-extern void printTable(char *, int, sqlite3 * db);
+extern void deleteTask(sqlite3 * db, int (* callback)(void *, int, char **, char **), int);
+extern void startStop(sqlite3 * db, int (* callback)(void *, int, char **, char **), int id);
+extern void printTable(sqlite3 * db, char *, int);
 extern int callback(void * data, int argc, char **argv, char ** azColName);
 
 typedef struct Query {

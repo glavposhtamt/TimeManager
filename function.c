@@ -115,14 +115,14 @@ void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
    sqlQuery(db, callback, task);
 }
 
-void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){    
+void deleteTask(sqlite3 * db, int (* callback)(void *, int, char **, char **), int id){    
    /*
     * int flag:
     * 0 - remove row
     * 1 - remove all
     */ 
     
-   if(!flag && id > 0){
+   if(id && id > 0){
         char * sqlTime = "DELETE FROM TIME WHERE ID = %d;",
              * sqlTask = "DELETE FROM TASK WHERE TIMEID = %d;";
 
@@ -130,7 +130,7 @@ void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, cha
         sqlQuery(db, callback, sqlTask, id);
         
     }
-    if(flag){
+    else if(id == -1) {
         sqlQuery(db, callback, "DELETE FROM TIME; DELETE FROM TASK;");
     }
 }
@@ -150,7 +150,7 @@ void updateStatus(int id, int status, sqlite3 * db, int (* callback)(void *, int
     sqlQuery(db, callback, query, id); 
 }
 
-void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+void startStop(sqlite3 * db, int (* callback)(void *, int, char **, char **), int id){
     
     values * val = selectFromTable(db, "select count(*) as count from TASK where TIMEID = %d AND STOP IS NULL;", id);
     
@@ -221,7 +221,7 @@ cl secToTime(double seconds){
     return hms;
 }
 
-void printTable(char * sql, int id, sqlite3 * db){
+void printTable(sqlite3 * db, char * sql, int id){
     int i, j, timeId;
     double seconds = 0.0;
     values * val;

@@ -53,19 +53,22 @@ void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
                     "START    datetime         NOT NULL," \
                     "STOP     datetime           );";
 
+  char * targ = "CREATE TABLE IF NOT EXISTS TARGET (" \
+                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+                    "DATE     date             NOT NULL," \
+                    "MESSAGE  CHAR(100)        NOT NULL);";
+
    sqlQuery(db, time, callback, NULL);    
    sqlQuery(db, task, callback, NULL);
-    
+   sqlQuery(db, targ, callback, NULL);
 }
 
-void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    char query[124];
-    char * sql = "INSERT INTO TIME (DATE, MESSAGE) VALUES (date('now')";
+void addDoing(char * msg, char * table, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
+    char query[256];
     
-    sprintf(query, "%s, '%s');", sql, msg);
+    sprintf(query, "INSERT INTO %s (DATE, MESSAGE) VALUES (date('now'), '%s')", table, msg);
             
     sqlQuery(db, query, callback, NULL);    
-
 }
 
 void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){    
@@ -221,5 +224,23 @@ void printTable(char * sql, int id, sqlite3 * db){
     }
 
     freeStructValues(val);   
+}
+
+void deleteTarget(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){    
+   /*
+    * int flag:
+    * 0 - remove row
+    * 1 - remove all
+    */ 
+    
+    if(!flag && id > 0){
+        char query[64];
+        
+        sprintf(query, "DELETE FROM TARGET WHERE ID = %d;", id);
+        sqlQuery(db, query, callback, NULL); 
+    }
+    if(flag){
+        sqlQuery(db, "DELETE FROM TARGET;", callback, NULL);
+    }
 }
 

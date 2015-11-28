@@ -17,12 +17,17 @@
 #define CHANGE        "ch"
 #define INFO          "info"
 
+/* Flags */
+
+#define TARGET        "-t"
+
 extern void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **));
-extern void addDoing(char * msg, sqlite3 * db, int (* callback)(void *, int, char **, char **));
+extern void addDoing(char * msg, char * table, sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int);
 extern void taskToLastday(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **));
 extern void printTable(char *, int, sqlite3 * db);
+extern void deleteTarget(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag);
 
 typedef struct Query {
    char ** result;

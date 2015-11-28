@@ -1,12 +1,40 @@
 #include "header.h"
 
-void sqlQuery(sqlite3 * db, const char * sql, int (* callback)(void *, int, char **, char **), void * data){
-    int rc;
-    char * zErrMsg = 0;
+int callback(void * data, int argc, char **argv, char ** azColName){ return 0; }
+
+void sqlQuery(sqlite3 * db, int (* callback)(void *, int, char **, char **), char * fmt, ... ){
     
-    rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
+   va_list ap;
+   int d, rc, count = 0;
+   char c, *s, *zErrMsg = 0, query[256], *sql = fmt;
+
+   va_start(ap, fmt);
+   while (*fmt)
+       if(*fmt++ == '%') {
+           switch (*fmt) {
+               case 's':              /* string */
+                   s = va_arg(ap, char *);
+                   sprintf(query, sql, s);
+                   break;
+               case 'd':              /* int */
+                   d = va_arg(ap, int);
+                   sprintf(query, sql, d);
+                   break;
+               case 'c':              /* char */
+                   c = (char) va_arg(ap, int);
+                   sprintf(query, sql, c);
+                   break;
+            }
+            ++count;
+            break;
+       }
     
-    if( rc != SQLITE_OK ){
+   va_end(ap);
+
+   if(count) rc = sqlite3_exec(db, query, callback, NULL, &zErrMsg); 
+   else rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
+    
+   if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
     }
@@ -53,22 +81,13 @@ void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **)){
                     "START    datetime         NOT NULL," \
                     "STOP     datetime           );";
 
-  char * targ = "CREATE TABLE IF NOT EXISTS TARGET (" \
+/*  char * targ = "CREATE TABLE IF NOT EXISTS TARGET (" \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                     "DATE     date             NOT NULL," \
-                    "MESSAGE  CHAR(100)        NOT NULL);";
+                    "MESSAGE  CHAR(100)        NOT NULL);";*/
 
-   sqlQuery(db, time, callback, NULL);    
-   sqlQuery(db, task, callback, NULL);
-   sqlQuery(db, targ, callback, NULL);
-}
-
-void addDoing(char * msg, char * table, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
-    char query[256];
-    
-    sprintf(query, "INSERT INTO %s (DATE, MESSAGE) VALUES (date('now'), '%s')", table, msg);
-            
-    sqlQuery(db, query, callback, NULL);    
+   sqlQuery(db, callback, time);    
+   sqlQuery(db, callback, task);
 }
 
 void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){    
@@ -78,26 +97,19 @@ void deleteTask(int id, sqlite3 * db, int (* callback)(void *, int, char **, cha
     * 1 - remove all
     */ 
     
-    if(!flag && id > 0){
-        char query[64];
+   if(!flag && id > 0){
+        char * sqlTime = "DELETE FROM TIME WHERE ID = %d;",
+             * sqlTask = "DELETE FROM TASK WHERE TIMEID = %d;";
+
+        sqlQuery(db, callback, sqlTime, id);    
+        sqlQuery(db, callback, sqlTask, id);
         
-        sprintf(query, "DELETE FROM TIME WHERE ID = %d;", id);
-        sqlQuery(db, query, callback, NULL); 
-        
-        sprintf(query, "DELETE FROM TASK WHERE TIMEID = %d;", id);
-        sqlQuery(db, query, callback, NULL); 
     }
     if(flag){
-        sqlQuery(db, "DELETE FROM TIME; DELETE FROM TASK;", callback, NULL);
+        sqlQuery(db, callback, "DELETE FROM TIME; DELETE FROM TASK;");
     }
 }
 
-void taskToLastday(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)) {
-    char query[64];
-    
-    sprintf(query, "UPDATE TIME SET DATE = date('now') WHERE ID = %d;", id);
-    sqlQuery(db, query, callback, NULL); 
-}
 
 void updateStatus(int id, int status, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
     
@@ -107,10 +119,10 @@ void updateStatus(int id, int status, sqlite3 * db, int (* callback)(void *, int
      * status == 0 - no active
      */
 
-    char query[64];
+    char * query = status ? "UPDATE TIME SET STATUS = 1 WHERE ID = %d;"
+                          : "UPDATE TIME SET STATUS = 0 WHERE ID = %d;";
     
-    sprintf(query, "UPDATE TIME SET STATUS = %d WHERE ID = %d;", status,  id);
-    sqlQuery(db, query, callback, NULL); 
+    sqlQuery(db, callback, query, id); 
 }
 
 void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **)){
@@ -129,13 +141,12 @@ void startStop(int id, sqlite3 * db, int (* callback)(void *, int, char **, char
      * flag == TRUE  - UPDATE
      */ 
     
-    if(!flag) sprintf(query, "INSERT INTO TASK (TIMEID, START) VALUES (%d, datetime('now'));", id);
-    if(flag) sprintf(query, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d AND STOP IS NULL;", id);
-
-    sqlQuery(db, query, callback, NULL);
+    if(!flag) sqlQuery(db, callback, "INSERT INTO TASK (TIMEID, START) VALUES (%d, datetime('now'));", id);
+    else sqlQuery(db, callback, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d AND STOP IS NULL;", id);
 
     freeStructValues(val);
 }
+
 
 double getPeriod(char * dateStart, char * dateStop){
     struct tm tmStart, tmStop;
@@ -224,23 +235,5 @@ void printTable(char * sql, int id, sqlite3 * db){
     }
 
     freeStructValues(val);   
-}
-
-void deleteTarget(int id, sqlite3 * db, int (* callback)(void *, int, char **, char **), int flag){    
-   /*
-    * int flag:
-    * 0 - remove row
-    * 1 - remove all
-    */ 
-    
-    if(!flag && id > 0){
-        char query[64];
-        
-        sprintf(query, "DELETE FROM TARGET WHERE ID = %d;", id);
-        sqlQuery(db, query, callback, NULL); 
-    }
-    if(flag){
-        sqlQuery(db, "DELETE FROM TARGET;", callback, NULL);
-    }
 }
 

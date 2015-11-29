@@ -1,5 +1,3 @@
-/* cc -o time task.c function.c -g -Wall -lsqlite3 -D_XOPEN_SOURCE=600 */
-
 #include "header.h"
 
 int main(int argc, char * argv[]){

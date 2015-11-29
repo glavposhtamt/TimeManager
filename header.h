@@ -1,12 +1,11 @@
 #ifndef HEADER
 #define HEADER
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sqlite3.h>
-#include <stddef.h>
 #include <time.h>
-#include <stdarg.h>
+
+#include "wrapper.h"
 
 /* Commands */
 
@@ -18,18 +17,12 @@
 #define CHANGE        "ch"
 #define INFO          "info"
 
-extern void initTables(sqlite3 * db, int (* callback)(void *, int, char **, char **));
-extern void sqlQuery(sqlite3 * db, int (* callback)(void *, int, char **, char **), char * fmt, ... );
-extern void deleteTask(sqlite3 * db, int (* callback)(void *, int, char **, char **), int);
-extern void startStop(sqlite3 * db, int (* callback)(void *, int, char **, char **), int id);
-extern void printTable(sqlite3 * db, char *, int);
-extern int callback(void * data, int argc, char **argv, char ** azColName);
+/* fC is int (* fC)(void *, int, char **, char **) */
 
-typedef struct Query {
-   char ** result;
-   int columns;
-   int rows;
-} values;
+extern void initTables(sqlite3 * db, fC);
+extern void deleteTask(sqlite3 * db, fC, int);
+extern void startStop(sqlite3 * db, fC, int id);
+extern void printTable(sqlite3 * db, char *, int);
 
 typedef struct Clock {
     int sec;

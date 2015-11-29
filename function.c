@@ -43,7 +43,7 @@ void deleteTask(sqlite3 * db, fC callback, int id){
 }
 
 
-void updateStatus(int id, int status, sqlite3 * db, fC callback){
+void updateStatus(sqlite3 * db, fC callback, int id, int status){
     
     /*
      * int status:
@@ -63,7 +63,7 @@ void startStop(sqlite3 * db, fC callback, int id){
     
     int flag = atoi(val->result[1]);
 
-    updateStatus(id, !flag, db, callback);
+    updateStatus(db, callback, id, !flag);
 
     /*
      * int flag:
@@ -92,7 +92,7 @@ double getPeriod(char * dateStart, char * dateStop){
 }
 
 
-double getTaskTime(char * sql, int id, sqlite3 * db){
+double getTaskTime(sqlite3 * db, char * sql, int id){
     int i, j, proxy;
     double seconds = 0.0;
     
@@ -151,7 +151,7 @@ void printTable(sqlite3 * db, char * sql, int id){
             printf("%s\n", val->result[i]);
             j = 1;
         } else {
-            seconds = getTaskTime("select START, STOP from TASK where TIMEID = %d;", timeId, db);
+            seconds = getTaskTime(db, "select START, STOP from TASK where TIMEID = %d;", timeId);
             cl hms = secToTime(seconds);
             printf("%.2d:%.2d:%.2d\t", hms.hours, hms.min, hms.sec);
             printf("%s\t", atoi(val->result[i]) ? "Start" : "Pause");

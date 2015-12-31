@@ -13,13 +13,13 @@ void initTables(sqlite3 * db, fC callback){
                     "START    datetime         NOT NULL," \
                     "STOP     datetime           );";
 
-/*  char * targ = "CREATE TABLE IF NOT EXISTS TARGET (" \
+  char * group = "CREATE TABLE IF NOT EXISTS GROUP (" \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-                    "DATE     date             NOT NULL," \
-                    "MESSAGE  CHAR(100)        NOT NULL);";*/
+                    "TASKID   INTEGER          NOT NULL);";
 
    sqlQuery(db, callback, time);    
    sqlQuery(db, callback, task);
+   sqlQuery(db, callback, group);
 }
 
 void deleteTask(sqlite3 * db, fC callback, int id){    

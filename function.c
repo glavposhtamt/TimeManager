@@ -11,15 +11,19 @@ void initTables(sqlite3 * db, fC callback){
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                     "TIMEID   INTEGER          NOT NULL," \
                     "START    datetime         NOT NULL," \
-                    "STOP     datetime           );";
+                    "STOP     datetime," \
+                    "FOREIGN KEY(TIMEID) REFERENCES TIME(ID));";
 
-  char * group = "CREATE TABLE IF NOT EXISTS GROUP (" \
+  char * group = "CREATE TABLE IF NOT EXISTS GROUPTASK (" \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                     "TASKID   INTEGER          NOT NULL);";
+
+  char * foreignKey = "PRAGMA foreign_keys = ON;";
 
    sqlQuery(db, callback, time);    
    sqlQuery(db, callback, task);
    sqlQuery(db, callback, group);
+   sqlQuery(db, callback, foreignKey);
 }
 
 void deleteTask(sqlite3 * db, fC callback, int id){    

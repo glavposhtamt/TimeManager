@@ -19,6 +19,14 @@ set (SOURCES
         main.c
         function.c)
 
+set (GR_HEADERS
+        header.h
+        group.h)
+
+set (GR_SOURCES
+        groupmain.c
+        group.c)
+
 set (SQL_WRAPPER wsql)
 
 project (${PROJECT})
@@ -38,12 +46,17 @@ else ()
         message ("Unknown compiler")
 endif ()
 
-
+# Library
 add_library (${SQL_WRAPPER} SHARED ${LIB_HEADERS} ${LIB_SOURCES})
 target_link_libraries(${SQL_WRAPPER} ${LIBSQLITE3_LIBRARY})
 
+# Main-block
 add_executable(${PROJECT} ${HEADERS} ${SOURCES})
 target_link_libraries (${PROJECT} ${SQL_WRAPPER})
+
+# Group-block
+add_executable(group ${GR_HEADERS} ${GR_SOURCES})
+target_link_libraries (group ${SQL_WRAPPER})
 
 
 

@@ -14,13 +14,9 @@ void initTables(sqlite3 * db, fC callback){
                     "STOP     datetime," \
                     "FOREIGN KEY(TIMEID) REFERENCES TIME(ID));";
 
-  char * group = "CREATE TABLE IF NOT EXISTS GROUPTASK (" \
-                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-                    "TASKID   INTEGER          NOT NULL);";
 
    sqlQuery(db, callback, time);    
    sqlQuery(db, callback, task);
-   sqlQuery(db, callback, group);
    foreignKey(db, 1);
 
 }

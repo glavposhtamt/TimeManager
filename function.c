@@ -3,7 +3,7 @@
 void initTables(sqlite3 * db, fC callback){
    char * time = "CREATE TABLE IF NOT EXISTS TIME (" \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-                    "DATE     date             NOT NULL," \
+                    "DISPLAY  INTEGER          NOT NULL," \
                     "MESSAGE  CHAR(100)        NOT NULL," \
                     "STATUS   INTEGER          DEFAULT 0);";
     

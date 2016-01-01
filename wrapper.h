@@ -21,6 +21,7 @@ extern int callback(void * data, int argc, char **argv, char ** azColName);
 extern void sqlQuery(sqlite3 * db, fC, char * fmt, ... );
 extern values * selectFromTable(sqlite3 * db, char * fmt, ...);
 extern void freeStructValues(values * val);
+extern void foreignKey(sqlite3 * db, int flag);
 
 #endif // WRAPPER
 

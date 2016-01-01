@@ -87,6 +87,14 @@ values * selectFromTable(sqlite3 * db, char * fmt, ...){
     }    
 }
 
+void foreignKey(sqlite3 * db, int flag){
+    char * foreignKeyOn = "PRAGMA foreign_keys = ON;";
+    char * foreignKeyOff = "PRAGMA foreign_keys = OFF;";
+
+    if(flag) sqlQuery(db, callback, foreignKeyOn);
+    else sqlQuery(db, callback, foreignKeyOff);
+}
+
 void freeStructValues(values * val){
     sqlite3_free_table(val->result);
     free(val);

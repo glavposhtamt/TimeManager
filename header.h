@@ -14,7 +14,6 @@
 #define CLEAN         "clean"
 #define LAST_DAY      "ld"
 #define SHOW_ALL      "all"
-#define CHANGE        "ch"
 #define INFO          "info"
 
 /* fC is int (* fC)(void *, int, char **, char **) */

@@ -18,12 +18,11 @@ void initTables(sqlite3 * db, fC callback){
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                     "TASKID   INTEGER          NOT NULL);";
 
-  char * foreignKey = "PRAGMA foreign_keys = ON;";
-
    sqlQuery(db, callback, time);    
    sqlQuery(db, callback, task);
    sqlQuery(db, callback, group);
-   sqlQuery(db, callback, foreignKey);
+   foreignKey(db, 1);
+
 }
 
 void deleteTask(sqlite3 * db, fC callback, int id){    
@@ -33,17 +32,21 @@ void deleteTask(sqlite3 * db, fC callback, int id){
     * 1 - remove all
     */ 
     
+   foreignKey(db, 0);
+
    if(id && id > 0){
         char * sqlTime = "DELETE FROM TIME WHERE ID = %d;",
              * sqlTask = "DELETE FROM TASK WHERE TIMEID = %d;";
 
-        sqlQuery(db, callback, sqlTime, id);    
         sqlQuery(db, callback, sqlTask, id);
+        sqlQuery(db, callback, sqlTime, id);
         
     }
     else if(id == -1) {
         sqlQuery(db, callback, "DELETE FROM TIME; DELETE FROM TASK;");
     }
+
+   foreignKey(db, 1);
 }
 
 

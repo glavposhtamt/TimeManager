@@ -50,9 +50,9 @@ endif ()
 add_library (${SQL_WRAPPER} SHARED ${LIB_HEADERS} ${LIB_SOURCES})
 target_link_libraries(${SQL_WRAPPER} ${LIBSQLITE3_LIBRARY})
 
-# Main-block
-add_executable(${PROJECT} ${HEADERS} ${SOURCES})
-target_link_libraries (${PROJECT} ${SQL_WRAPPER})
+# Time-tracker-block
+add_executable(ttr ${HEADERS} ${SOURCES})
+target_link_libraries (ttr ${SQL_WRAPPER})
 
 # Group-block
 add_executable(group ${GR_HEADERS} ${GR_SOURCES})

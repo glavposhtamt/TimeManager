@@ -2,6 +2,7 @@
 #define GROUP
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "wrapper.h"
 

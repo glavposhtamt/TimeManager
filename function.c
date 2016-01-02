@@ -31,17 +31,11 @@ void deleteTask(sqlite3 * db, fC callback, int id){
     
    foreignKey(db, 0);
 
-   if(id && id > 0){
-        char * sqlTime = "DELETE FROM TIME WHERE ID = %d;",
-             * sqlTask = "DELETE FROM TASK WHERE TIMEID = %d;";
+   if(id && id > 0)
+        sqlQuery(db, callback, "DELETE FROM TIME WHERE ID = %d; DELETE FROM TASK WHERE TIMEID = %d;", id, id);
 
-        sqlQuery(db, callback, sqlTask, id);
-        sqlQuery(db, callback, sqlTime, id);
-        
-    }
-    else if(id == -1) {
-        sqlQuery(db, callback, "DELETE FROM TIME; DELETE FROM TASK;");
-    }
+    else if(id == -1)
+        sqlQuery(db, callback, "DELETE FROM TIME; DELETE FROM TASK;");    
 
    foreignKey(db, 1);
 }

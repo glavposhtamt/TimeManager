@@ -17,6 +17,6 @@ void initTables(sqlite3 * db, fC callback){
 
    sqlQuery(db, callback, glist);
    sqlQuery(db, callback, gtask);
-   foreignKey(db, 1);
+   //foreignKey(db, 1);
 
 }

@@ -12,7 +12,7 @@ int main(int argc, char * argv[]){
       exit(0);
    }
 
-    initTables(db, callback);    
+    initTables(db, callback);
 
     /* Info */
 

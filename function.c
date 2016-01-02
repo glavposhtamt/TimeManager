@@ -21,6 +21,7 @@ void initTables(sqlite3 * db, fC callback){
 
 }
 
+
 void deleteTask(sqlite3 * db, fC callback, int id){    
    /*
     * int flag:
@@ -164,4 +165,3 @@ void printTable(sqlite3 * db, char * sql, int id){
 
     freeStructValues(val);   
 }
-

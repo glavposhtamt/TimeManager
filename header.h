@@ -11,7 +11,6 @@
 
 #define MESSAGE       "add"
 #define REMOVE        "rm"
-#define CLEAN         "clean"
 #define DISPLAY       "disp"
 #define UNDISPLAY     "undisp"
 #define SHOW_ALL      "all"

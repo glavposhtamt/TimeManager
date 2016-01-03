@@ -24,7 +24,7 @@ void initTables(sqlite3 * db, fC callback){
 
 void deleteTask(sqlite3 * db, fC callback, int id){    
    /*
-    * int flag:
+    * int id:
     * 0 - remove row
     * 1 - remove all
     */ 

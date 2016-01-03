@@ -28,12 +28,13 @@ int main(int argc, char * argv[]){
 
     /* Commands */
 
-    if(argc == 3)
+    if(argc == 3) {
         if(!strcmp(MESSAGE, argv[1]))
             sqlQuery(db, callback, "INSERT INTO GROUPLIST (DISPLAY, MESSAGE) VALUES (1, '%s');", argv[2] );
-/*
-        else if(!strcmp(REMOVE, argv[1])) deleteTask(db, callback, atoi(argv[2]));
 
+        else if(!strcmp(REMOVE, argv[1])) deleteGroup(db, callback, atoi(argv[2]));
+}
+      /*
         else if(!strcmp(DISPLAY, argv[1]))
             sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 1 WHERE ID = %d;", atoi(argv[2]));
 

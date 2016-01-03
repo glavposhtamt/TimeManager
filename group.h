@@ -19,6 +19,7 @@
 /* fC is int (* fC)(void *, int, char **, char **) */
 
 extern void initTables(sqlite3 * db, fC);
+extern void deleteGroup(sqlite3 * db, fC callback, int id);
 
 #endif // GROUP
 

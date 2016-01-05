@@ -6,6 +6,7 @@
 #include <time.h>
 
 #include "wrapper.h"
+#include "time.h"
 
 /* Commands */
 
@@ -22,12 +23,6 @@ extern void initTables(sqlite3 * db, fC);
 extern void deleteTask(sqlite3 * db, fC, int);
 extern void startStop(sqlite3 * db, fC, int id);
 extern void printTable(sqlite3 * db, char *, int);
-
-typedef struct Clock {
-    int sec;
-    int min;
-    int hours;
-} cl;
 
 #endif // HEADER
 

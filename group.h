@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "wrapper.h"
+#include "time.h"
 
 /* Commands */
 

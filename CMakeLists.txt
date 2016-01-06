@@ -18,18 +18,6 @@ set (SOURCES
         main.c
         function.c)
 
-set (GR_HEADERS
-        header.h
-        group.h)
-set (GR_SOURCES
-        groupmain.c
-        group.c)
-
-set (LIB_TIME time)
-set (LIB_TIME_HEADERS
-        time.h)
-set (LIB_TIME_SOURCES
-        time.c)
 
 project (${PROJECT})
 
@@ -52,17 +40,9 @@ endif ()
 add_library (${SQL_WRAPPER} SHARED ${LIB_HEADERS} ${LIB_SOURCES})
 target_link_libraries(${SQL_WRAPPER} ${LIBSQLITE3_LIBRARY})
 
-# Time-Library
-add_library (${LIB_TIME} SHARED ${LIB_TIME_HEADERS} ${LIB_TIME_SOURCES})
-
 # Time-tracker-block
-add_executable(ttr ${HEADERS} ${SOURCES})
-target_link_libraries (ttr ${SQL_WRAPPER} ${LIB_TIME})
-
-# Group-block
-add_executable(group ${GR_HEADERS} ${GR_SOURCES})
-target_link_libraries (group ${SQL_WRAPPER} ${LIB_TIME})
-
+add_executable(${PROJECT} ${HEADERS} ${SOURCES})
+target_link_libraries (${PROJECT} ${SQL_WRAPPER})
 
 
 #aux_source_directory(. SRC_LIST)

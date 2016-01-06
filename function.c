@@ -1,6 +1,7 @@
 #include "header.h"
 
 void initTables(sqlite3 * db, fC callback){
+
    char * time = "CREATE TABLE IF NOT EXISTS TIME (" \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                     "DISPLAY  INTEGER          NOT NULL," \
@@ -14,9 +15,21 @@ void initTables(sqlite3 * db, fC callback){
                     "STOP     datetime," \
                     "FOREIGN KEY(TIMEID) REFERENCES TIME(ID));";
 
+  char * glist = "CREATE TABLE IF NOT EXISTS GROUPLIST (" \
+                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+                    "MESSAGE  CHAR(100)        NOT NULL,"\
+                    "DISPLAY  INTEGER          NOT NULL)";
+
+
+  char * gtask = "CREATE TABLE IF NOT EXISTS GROUPTASK (" \
+                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+                    "TIMEID   INTEGER          NOT NULL,"\
+                    "FOREIGN KEY(TIMEID) REFERENCES TIME(ID));";
 
    sqlQuery(db, callback, time);    
    sqlQuery(db, callback, task);
+   sqlQuery(db, callback, glist);
+   sqlQuery(db, callback, gtask);
    foreignKey(db, 1);
 
 }
@@ -40,6 +53,23 @@ void deleteTask(sqlite3 * db, fC callback, int id){
    foreignKey(db, 1);
 }
 
+void deleteGroup(sqlite3 * db, fC callback, int id){
+   /*
+    * int id:
+    * 0 - remove row
+    * 1 - remove all
+    */
+
+   foreignKey(db, 0);
+
+   if(id && id > 0)
+        sqlQuery(db, callback, "DELETE FROM GROUPLIST WHERE ID = %d; DELETE FROM GROUPTASK WHERE TIMEID = %d;", id, id);
+
+    else if(id == -1)
+        sqlQuery(db, callback, "DELETE FROM GROUPLIST; DELETE FROM GROUPTASK;");
+
+   foreignKey(db, 1);
+}
 
 void updateStatus(sqlite3 * db, fC callback, int id, int status){
     
@@ -111,6 +141,19 @@ double getTaskTime(sqlite3 * db, char * sql, int id){
     freeStructValues(val); 
    
     return seconds;
+}
+
+cl secToTime(double seconds){
+    long s = (long)seconds;
+    int allMin;
+    cl hms;
+
+    hms.sec = s >= 60 ? s % 60 : s;
+    allMin = s / 60;
+    hms.min = allMin >= 60 ? allMin % 60 : allMin;
+    hms.hours = allMin / 60;
+
+    return hms;
 }
 
 void printTable(sqlite3 * db, char * sql, int id){

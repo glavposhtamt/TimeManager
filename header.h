@@ -9,7 +9,7 @@
 
 /* Commands */
 
-#define MESSAGE       "add"
+#define ADD           "add"
 #define REMOVE        "rm"
 #define DISPLAY       "disp"
 #define UNDISPLAY     "undisp"

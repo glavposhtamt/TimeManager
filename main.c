@@ -16,23 +16,30 @@ int main(int argc, char * argv[]){
 
     /* Info */
 
-    const char * info = "Пользуйся командами:\n"\
-                        "%s ... - Добавить задачу.\n"\
+    const char * info = "\nПользуйся командами:\n"\
+                        "%s ... [%s, %s] - Добавить задачу/группу.\n"\
                         "%s [id] - Удалить задачу.\n"\
                         "%s [id] - Показать.\n"\
                         "%s [id] - Скрыть.\n"\
                         "%s - Удаление ВСЕХ задач\n"\
                         "[id] - start/pause.\n"\
                         "%s - Вывести все задачи за все дни.\n"\
-                        "%s - Вывести это сообщение\n";
+                        "%s - Вывести это сообщение\n\n";
 
     /* Commands */   
 
-    if(argc == 3){
-        if(!strcmp(MESSAGE, argv[1])) 
-            sqlQuery(db, callback, "INSERT INTO TIME (DISPLAY, MESSAGE) VALUES (1, '%s');", argv[2] );
-        
-        else if(!strcmp(REMOVE, argv[1])) deleteTask(db, callback, atoi(argv[2]));
+    if(argc == 4) {
+        if(!strcmp(ADD, argv[1])) {
+            if(!strcmp(ADD_TASK, argv[3]))
+                sqlQuery(db, callback, "INSERT INTO TIME (DISPLAY, MESSAGE) VALUES (1, '%s');", argv[2] );
+            else if(!strcmp(ADD_GROUP, argv[3]))
+                sqlQuery(db, callback, "INSERT INTO GROUPLIST (DISPLAY, MESSAGE) VALUES (1, '%s');", argv[2] );
+        }
+    }
+
+    else if(argc == 3){
+
+        if(!strcmp(REMOVE, argv[1])) deleteTask(db, callback, atoi(argv[2]));
 
         else if(!strcmp(DISPLAY, argv[1]))
             sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 1 WHERE ID = %d;", atoi(argv[2]));
@@ -49,12 +56,12 @@ int main(int argc, char * argv[]){
         else if(!strcmp(UNDISPLAY, argv[1])) sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 0;");
         else if(!strcmp(DISPLAY, argv[1])) sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 1;");
         else if(!strcmp(INFO, argv[1])) 
-            printf(info, MESSAGE, REMOVE, DISPLAY, UNDISPLAY, REMOVE, SHOW_ALL, INFO);
+            printf(info, ADD, ADD_TASK, ADD_GROUP, REMOVE, DISPLAY, UNDISPLAY, REMOVE, SHOW_ALL, INFO);
         
         else printf("Неверно введена команда!\n");
     } 
     else if(argc == 1) printTable(db, "select ID, STATUS, MESSAGE from TIME WHERE DISPLAY = 1;", 0);
-    else printf(info, MESSAGE, REMOVE, DISPLAY, UNDISPLAY, REMOVE, SHOW_ALL, INFO);
+    else printf(info, ADD, ADD_TASK, ADD_GROUP, REMOVE, DISPLAY, UNDISPLAY, REMOVE, SHOW_ALL, INFO);
                      
    /* Close database */
 

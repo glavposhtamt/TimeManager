@@ -133,6 +133,7 @@ double getTaskTime(sqlite3 * db, char * sql, int id){
     return seconds;
 }
 
+
 cl secToTime(double seconds){
     long s = (long)seconds;
     int allMin;
@@ -181,9 +182,9 @@ void printTableTask(sqlite3 * db, char * sql, int id){
 }
 
 void printTableGroup(sqlite3 * db, char * sql, int id){
-    int i, j, timeId;
+    int i, j, k, timeId;
     double seconds = 0.0;
-    values * val;
+    values * val, * ids;
 
     if(id > 0) {
         val = selectFromTable(db, sql, id);
@@ -192,21 +193,32 @@ void printTableGroup(sqlite3 * db, char * sql, int id){
     int count = val->columns * val->rows + val->columns;
 
     for (i = val->columns, j = 1; i < count; i++) {
-        if(j == 1) {
-          timeId = atoi(val->result[i]);
-          printf("[%d]\t", timeId);
-          j++;
-          continue;
-        }
+        switch(j) {
+            case 1:
+                timeId = atoi(val->result[i]);
+                printf("[%d]\t", timeId);
 
-        if(j == val->columns) {
-            printf("%s\n", val->result[i]);
-            j = 1;
-        } else {
-            seconds = getTaskTime(db, "select START, STOP from TASK where TIMEID = %d;", timeId);
+                ids = selectFromTable(db, "SELECT id FROM time WHERE groupid = %d", timeId);
+                int tcount = ids->columns * ids->rows + ids->columns;
+
+                for (k = ids->columns; k < tcount; k++) {
+                    seconds += getTaskTime(db, "select START, STOP from TASK where TIMEID = %d;", atoi(ids->result[k]));
+                }
+
+                freeStructValues(ids);
+
+                j++;
+                break;
+
+            case 3:
+                printf("%s\n", val->result[i]);
+                j = 1;
+                break;
+       }
+        if(j == 2){
             cl hms = secToTime(seconds);
             printf("%.2d:%.2d:%.2d\t", hms.hours, hms.min, hms.sec);
-            printf("%s\t", atoi(val->result[i]) ? "Start" : "Pause");
+            seconds = 0.0;
             j++;
         }
     }

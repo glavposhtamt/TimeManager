@@ -15,6 +15,7 @@
 #define UNDISPLAY     "undisp"
 #define SHOW_ALL      "all"
 #define INFO          "info"
+#define GROUP         "gr"
 
 /* Flags */
 
@@ -34,7 +35,7 @@ extern void deleteTask(sqlite3 * db, fC, int);
 extern void deleteGroup(sqlite3 * db, fC, int);
 extern void startStop(sqlite3 * db, fC, int);
 extern void printTableTask(sqlite3 * db, char *, int);
+extern void printTableGroup(sqlite3 * db, char *, int);
 extern cl secToTime(double seconds);
 
 #endif // HEADER
-

@@ -18,11 +18,12 @@ int main(int argc, char * argv[]){
 
     const char * info = "\nПользуйся командами:\n"\
                         "%s ... [%s, %s] - Добавить задачу/группу.\n"\
-                        "%s [id] - Удалить задачу.\n"\
-                        "%s [id] - Показать.\n"\
-                        "%s [id] - Скрыть.\n"\
+                        "%s [taskid] - Удалить задачу.\n"\
+                        "%s [taskid] - Показать.\n"\
+                        "%s [taskid] - Скрыть.\n"\
                         "%s - Удаление ВСЕХ задач\n"\
-                        "[id] - start/pause.\n"\
+                        "[taskid] - start/pause.\n"\
+                        "[taskid] %s [groupid] - Добавить задачу в группу задач.\n"\
                         "%s - Вывести все задачи за все дни.\n"\
                         "%s - Вывести это сообщение\n\n";
 
@@ -34,6 +35,10 @@ int main(int argc, char * argv[]){
                 sqlQuery(db, callback, "INSERT INTO TIME (DISPLAY, MESSAGE) VALUES (1, '%s');", argv[2] );
             else if(!strcmp(ADD_GROUP, argv[3]))
                 sqlQuery(db, callback, "INSERT INTO GROUPLIST (DISPLAY, MESSAGE) VALUES (1, '%s');", argv[2] );
+        }
+        if(atoi(argv[1]) && atoi(argv[3]) && !strcmp(GROUP, argv[2])){
+            sqlQuery(db, callback, "INSERT INTO GROUPTASK (GROUPID, TIMEID) VALUES (%d, %d);",
+                     atoi(argv[1]), atoi(argv[3]) );
         }
     }
 
@@ -56,12 +61,12 @@ int main(int argc, char * argv[]){
         else if(!strcmp(UNDISPLAY, argv[1])) sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 0;");
         else if(!strcmp(DISPLAY, argv[1])) sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 1;");
         else if(!strcmp(INFO, argv[1])) 
-            printf(info, ADD, ADD_TASK, ADD_GROUP, REMOVE, DISPLAY, UNDISPLAY, REMOVE, SHOW_ALL, INFO);
+            printf(info, ADD, ADD_TASK, ADD_GROUP, REMOVE, DISPLAY, UNDISPLAY, REMOVE, GROUP, SHOW_ALL, INFO);
         
         else printf("Неверно введена команда!\n");
     } 
     else if(argc == 1) printTable(db, "select ID, STATUS, MESSAGE from TIME WHERE DISPLAY = 1;", 0);
-    else printf(info, ADD, ADD_TASK, ADD_GROUP, REMOVE, DISPLAY, UNDISPLAY, REMOVE, SHOW_ALL, INFO);
+    else printf(info, ADD, ADD_TASK, ADD_GROUP, REMOVE, DISPLAY, UNDISPLAY, REMOVE, GROUP, SHOW_ALL, INFO);
                      
    /* Close database */
 

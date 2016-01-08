@@ -23,6 +23,7 @@ void initTables(sqlite3 * db, fC callback){
 
   char * gtask = "CREATE TABLE IF NOT EXISTS GROUPTASK (" \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+                    "GROUPID  INTEGER          NOT NULL,"\
                     "TIMEID   INTEGER          NOT NULL,"\
                     "FOREIGN KEY(TIMEID) REFERENCES TIME(ID));";
 

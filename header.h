@@ -15,6 +15,7 @@
 #define UNDISPLAY     "undisp"
 #define SHOW_ALL      "all"
 #define INFO          "info"
+#define GROUP         "gr"
 
 /* Flags */
 

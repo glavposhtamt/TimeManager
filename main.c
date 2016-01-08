@@ -42,10 +42,8 @@ int main(int argc, char * argv[]){
         }
 
         if(atoi(argv[1]) && atoi(argv[3]) && !strcmp(ADD, argv[2])){
-            foreignKey(db, 1);
             sqlQuery(db, callback, "UPDATE TIME SET GROUPID = %d WHERE ID = %d;",
                      atoi(argv[3]), atoi(argv[1]) );
-            foreignKey(db, 0);
         }
     }
 
@@ -58,6 +56,9 @@ int main(int argc, char * argv[]){
 
         else if(!strcmp(UNDISPLAY, argv[1]))
             sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 0 WHERE ID = %d;", atoi(argv[2]));
+
+        else if(!strcmp(GROUP, argv[1]))
+            printTableTask(db, "select ID, STATUS, MESSAGE from TIME WHERE GROUPID = %d;", atoi(argv[2]));
             
         else printf("Неверно введена команда!\n");
     }

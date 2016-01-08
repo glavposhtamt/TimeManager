@@ -12,8 +12,7 @@ void initTables(sqlite3 * db, fC callback){
                     "MESSAGE  CHAR(100)        NOT NULL," \
                     "DISPLAY  INTEGER          NOT NULL," \
                     "GROUPID  INTEGER          DEFAULT 0,"\
-                    "STATUS   INTEGER          DEFAULT 0,"\
-                    "FOREIGN KEY(GROUPID) REFERENCES GROUPLIST(ID));";
+                    "STATUS   INTEGER          DEFAULT 0);";
     
   char * task = "CREATE TABLE IF NOT EXISTS TASK ("  \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \

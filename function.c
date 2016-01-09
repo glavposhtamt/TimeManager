@@ -52,10 +52,10 @@ void deleteGroup(sqlite3 * db, fC callback, int id){
     */
 
    if(id && id > 0)
-        sqlQuery(db, callback, "DELETE FROM GROUPLIST WHERE ID = %d; DELETE FROM GROUPTASK WHERE TIMEID = %d;", id, id);
+        sqlQuery(db, callback, "DELETE FROM GROUPLIST WHERE ID = %d;", id);
 
     else if(id == -1)
-        sqlQuery(db, callback, "DELETE FROM GROUPLIST; DELETE FROM GROUPTASK;");
+        sqlQuery(db, callback, "DELETE FROM GROUPLIST;");
 
 }
 

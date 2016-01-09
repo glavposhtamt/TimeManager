@@ -41,17 +41,20 @@ int main(int argc, char * argv[]){
             sqlQuery(db, callback, "INSERT INTO %s (DISPLAY, MESSAGE) VALUES (1, '%s');", table, argv[2] );
         }
 
-        if(atoi(argv[1]) && atoi(argv[3]) && !strcmp(ADD, argv[2])){
+        else if(atoi(argv[1]) && atoi(argv[3]) && !strcmp(ADD, argv[2])){
             sqlQuery(db, callback, "UPDATE TIME SET GROUPID = %d WHERE ID = %d;",
                      atoi(argv[3]), atoi(argv[1]) );
+        }
+
+        else if(!strcmp(REMOVE, argv[1]) && atoi(argv[2])){
+            if(!strcmp(ADD_TASK, argv[3])) deleteTask(db, callback, atoi(argv[2]));
+            else if(!strcmp(ADD_GROUP, argv[3])) deleteGroup(db, callback, atoi(argv[2]));
         }
     }
 
     else if(argc == 3){
 
-        if(!strcmp(REMOVE, argv[1])) deleteTask(db, callback, atoi(argv[2]));
-
-        else if(!strcmp(DISPLAY, argv[1]))
+        if(!strcmp(DISPLAY, argv[1]))
             sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 1 WHERE ID = %d;", atoi(argv[2]));
 
         else if(!strcmp(UNDISPLAY, argv[1]))

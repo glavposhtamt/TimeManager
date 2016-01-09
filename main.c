@@ -62,12 +62,16 @@ int main(int argc, char * argv[]){
 
         else if(!strcmp(GROUP, argv[1]))
             printTableTask(db, "SELECT ID, STATUS, MESSAGE FROM TIME WHERE GROUPID = %d;", atoi(argv[2]));
+
+        else if(!strcmp(REMOVE, argv[1])) {
+            if(!strcmp(ADD_TASK, argv[2])) deleteTask(db, callback, -1);
+            else if(!strcmp(ADD_GROUP, argv[2])) deleteGroup(db, callback, -1);
+        }
             
         else printf("Неверно введена команда!\n");
     }
     else if(argc == 2) { 
         if(atoi(argv[1]) > 0) startStop(db, callback, atoi(argv[1]));
-        else if(!strcmp(REMOVE, argv[1])) deleteTask(db, callback, -1);
         else if(!strcmp(SHOW_ALL, argv[1])) printTableTask(db, "SELECT ID, STATUS, MESSAGE FROM TIME;", 0);
         else if(!strcmp(UNDISPLAY, argv[1])) sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 0;");
         else if(!strcmp(DISPLAY, argv[1])) sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 1;");

@@ -2,11 +2,21 @@
 
 int callback(void * data, int argc, char **argv, char ** azColName){ return 0; }
 
+void formatPercent(char * proxy, char * buff){
+    int i = 0, k = 0;
+    while(proxy[i]){
+        if(proxy[i] == '%' && proxy[i + 1] == '%') i++;
+        buff[k++] = proxy[i++];
+    }
+    buff[k] = '\0';
+}
+
+
 void sqlQuery(sqlite3 * db, fC callback, char * fmt, ... ){
 
    va_list ap;
    int d, rc, i = 0;
-   char c, *s, *zErrMsg = 0, proxy[265], buff[256];
+   char c, *s, *zErrMsg = 0, proxy[SIZE], buff[SIZE];
 
    va_start(ap, fmt);
 
@@ -50,7 +60,9 @@ void sqlQuery(sqlite3 * db, fC callback, char * fmt, ... ){
 
     va_end(ap);
 
-    rc = sqlite3_exec(db, proxy, callback, NULL, &zErrMsg);
+    formatPercent(proxy, buff);
+
+    rc = sqlite3_exec(db, buff, callback, NULL, &zErrMsg);
 
     
    if( rc != SQLITE_OK ){
@@ -62,7 +74,7 @@ void sqlQuery(sqlite3 * db, fC callback, char * fmt, ... ){
 values * selectFromTable(sqlite3 * db, char * fmt, ...){
     va_list ap;
     int rc, nrows, ncols, d, i = 0;
-    char ** result, * errmsg, c, *s, buff[256], proxy[265];
+    char ** result, * errmsg, c, *s, buff[SIZE], proxy[SIZE];
     values * val = malloc(sizeof(values));
     
     va_start(ap, fmt);
@@ -107,9 +119,9 @@ values * selectFromTable(sqlite3 * db, char * fmt, ...){
 
      va_end(ap);
 
-     printf("%s\n", proxy);
+     formatPercent(proxy, buff);
 
-   rc = sqlite3_get_table(db, proxy, &result, &nrows, &ncols, &errmsg);
+   rc = sqlite3_get_table(db, buff, &result, &nrows, &ncols, &errmsg);
 
     
     if( rc != SQLITE_OK ){

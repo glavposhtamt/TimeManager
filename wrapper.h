@@ -9,6 +9,10 @@
 #include <stddef.h>
 #include <stdarg.h>
 
+/* Size string buffer */
+
+#define SIZE 256
+
 typedef struct Query {
    char ** result;
    int columns;

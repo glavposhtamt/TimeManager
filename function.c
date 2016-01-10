@@ -182,7 +182,7 @@ void printTableTask(sqlite3 * db, char * sql, int id){
 
 void printTableGroup(sqlite3 * db, char * sql, int id){
     int i, j, k, timeId;
-    double seconds = 0.0;
+    double seconds = .0, secondsNow = .0;
     values * val, * ids;
 
     if(id > 0) {
@@ -202,6 +202,8 @@ void printTableGroup(sqlite3 * db, char * sql, int id){
 
                 for (k = ids->columns; k < tcount; k++) {
                     seconds += getTaskTime(db, "select START, STOP from TASK where TIMEID = %d;", atoi(ids->result[k]));
+                    secondsNow += getTaskTime(db, "select START, STOP from TASK where TIMEID = %d AND strftime('%%Y-%%m-%%d', STOP) = date('now');",
+                                              atoi(ids->result[k]));
                 }
 
                 freeStructValues(ids);
@@ -216,10 +218,16 @@ void printTableGroup(sqlite3 * db, char * sql, int id){
        }
         if(j == 2){
             cl hms = secToTime(seconds);
+            cl hmsNow = secToTime(secondsNow);
+
             printf("%.2d:%.2d:%.2d\t", hms.hours, hms.min, hms.sec);
+            printf("%.2d:%.2d:%.2d\t", hmsNow.hours, hmsNow.min, hmsNow.sec);
+
             seconds = 0.0;
+            secondsNow = 0.0;
             j++;
         }
+
     }
 
     freeStructValues(val);

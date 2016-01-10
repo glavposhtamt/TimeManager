@@ -38,6 +38,11 @@ void sqlQuery(sqlite3 * db, fC callback, char * fmt, ... ){
                 sprintf(buff, proxy, c);
                 for(i = 0; buff[i] != '\0'; i++) proxy[i] = buff[i];
                 break;
+            case '%':
+                proxy[i++] = '%';
+                proxy[i++] = *fmt++;
+
+                break;
             }
       }
 
@@ -90,12 +95,19 @@ values * selectFromTable(sqlite3 * db, char * fmt, ...){
                  sprintf(buff, proxy, c);
                  for(i = 0; buff[i] != '\0'; i++) proxy[i] = buff[i];
                  break;
+             case '%':
+                 proxy[i++] = '%';
+                 proxy[i++] = *fmt++;
+
+                 break;
              }
        }
 
      proxy[i] = '\0';
 
      va_end(ap);
+
+     printf("%s\n", proxy);
 
    rc = sqlite3_get_table(db, proxy, &result, &nrows, &ncols, &errmsg);
 

@@ -19,8 +19,8 @@
 
 /* Flags */
 
-#define ADD_GROUP "-g"
-#define ADD_TASK  "-t"
+#define ADD_GROUP "-group"
+#define ADD_TASK  "-task"
 
 /* fC is int (* fC)(void *, int, char **, char **) */
 

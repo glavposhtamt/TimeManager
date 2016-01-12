@@ -21,10 +21,15 @@ void initTables(sqlite3 * db, fC callback){
                     "STOP     datetime," \
                     "FOREIGN KEY(TIMEID) REFERENCES TIME(ID));";
 
+  char * target = "CREATE TABLE IF NOT EXISTS TARGET ("  \
+                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+                    "MESSAGE  CHAR(100)        NOT NULL," \
+                    "DATE     datetime         NOT NULL);";
 
    sqlQuery(db, callback, time);    
    sqlQuery(db, callback, task);
-   sqlQuery(db, callback, group );
+   sqlQuery(db, callback, group);
+   sqlQuery(db, callback, target);
 
   }
 

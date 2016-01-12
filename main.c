@@ -34,6 +34,11 @@ int main(int argc, char * argv[]){
             char * table;
             if(!strcmp(ADD_TASK, argv[3])) table = "TIME";
             else if(!strcmp(ADD_GROUP, argv[3])) table = "GROUPLIST";
+            else if(!strcmp(ADD_TARGET, argv[3])){
+                sqlQuery(db, callback, "INSERT INTO TARGET (MESSAGE, DATE) VALUES ('%s', datetime('now'));", argv[2]);
+                sqlite3_close(db);
+                return 0;
+            }
             else {
                sqlite3_close(db);
                return 0;
@@ -49,6 +54,8 @@ int main(int argc, char * argv[]){
         else if(!strcmp(REMOVE, argv[1]) && atoi(argv[2])){
             if(!strcmp(ADD_TASK, argv[3])) deleteTask(db, callback, atoi(argv[2]));
             else if(!strcmp(ADD_GROUP, argv[3])) deleteGroup(db, callback, atoi(argv[2]));
+            else if(!strcmp(ADD_TARGET, argv[3]))
+                sqlQuery(db, callback, "DELETE FROM TARGET WHERE ID = %d;", atoi(argv[2]));
         }
     }
 

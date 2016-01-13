@@ -137,7 +137,6 @@ double getTaskTime(sqlite3 * db, char * sql, int id){
     return seconds;
 }
 
-
 cl secToTime(double seconds){
     long s = (long)seconds;
     int allMin;
@@ -149,6 +148,10 @@ cl secToTime(double seconds){
     hms.hours = allMin / 60;
 
     return hms;
+}
+
+int secToDays(double seconds){
+    return seconds * 60 * 60 * 24;
 }
 
 void printTableTask(sqlite3 * db, char * sql, int id){

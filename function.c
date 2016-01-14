@@ -4,8 +4,8 @@ void initTables(sqlite3 * db, fC callback){
 
    char * group = "CREATE TABLE IF NOT EXISTS GROUPLIST (" \
                       "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-                      "MESSAGE  CHAR(100)        NOT NULL,"\
-                      "DISPLAY  INTEGER          NOT NULL)";
+                      "DISPLAY  INTEGER          NOT NULL,"\
+                      "MESSAGE  CHAR(100)        NOT NULL);";
 
    char * time = "CREATE TABLE IF NOT EXISTS TIME (" \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
@@ -113,7 +113,6 @@ double getPeriod(char * dateStart, char * dateStop){
     return difftime(timeStampStop, timeStampStart);
 }
 
-
 double getTaskTime(sqlite3 * db, char * sql, int id){
     int i, j, proxy;
     double seconds = 0.0;
@@ -151,7 +150,7 @@ cl secToTime(double seconds){
 }
 
 int secToDays(double seconds){
-    return seconds * 60 * 60 * 24;
+    return (int)seconds / 60 / 60 / 24;
 }
 
 void printTableTask(sqlite3 * db, char * sql, int id){
@@ -239,4 +238,49 @@ void printTableGroup(sqlite3 * db, char * sql, int id){
     }
 
     freeStructValues(val);
+}
+
+void printTableTarget(sqlite3 * db, char * sql, int id){
+    int i, j;
+    double seconds;
+    char curentTime[20];
+    values * val;
+    time_t tp;
+
+    time(&tp);
+    struct tm * mytm = gmtime(&tp);
+
+    mytm->tm_hour += 3;
+    strftime(curentTime, (size_t)20, "%Y-%m-%d %H:%M:%S", mytm);
+
+    printf("%s\n", curentTime);
+
+    if(id > 0) {
+        val = selectFromTable(db, sql, id);
+    } else val = selectFromTable(db, sql);
+
+    int count = val->columns * val->rows + val->columns;
+
+    for (i = val->columns, j = 1; i < count; i++) {
+        switch(j){
+            case 1:
+                printf("[%d]\t", atoi(val->result[i]));
+                j++;
+                break;
+
+            case 2:
+                seconds = getPeriod(val->result[i], curentTime);
+                printf("%d\t", secToDays(seconds));
+                j++;
+                break;
+
+            case 3:
+                printf("%s\n", val->result[i]);
+                j = 1;
+                break;
+        }
+    }
+
+    freeStructValues(val);
+
 }

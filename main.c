@@ -83,6 +83,7 @@ int main(int argc, char * argv[]){
         else if(!strcmp(UNDISPLAY, argv[1])) sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 0;");
         else if(!strcmp(DISPLAY, argv[1])) sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 1;");
         else  if(!strcmp(GROUP, argv[1])) printTableGroup(db, "SELECT ID, MESSAGE FROM grouplist WHERE display = 1", 0);
+        else  if(!strcmp(TARGET, argv[1])) printTableTarget(db, "SELECT ID, DATE, MESSAGE FROM TARGET", 0);
 
         else if(!strcmp(INFO, argv[1])) 
             printf(info, ADD, ADD_TASK, ADD_GROUP, REMOVE, DISPLAY, UNDISPLAY, REMOVE, ADD, SHOW_ALL, INFO);

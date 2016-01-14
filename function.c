@@ -268,6 +268,7 @@ void printTableTarget(sqlite3 * db, char * sql, int id){
 
             case 2:
                 seconds = getPeriod(val->result[i], curentTime);
+                printf("%s\t", val->result[i]);
                 printf("%d\t", secToDays(seconds));
                 j++;
                 break;

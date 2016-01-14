@@ -253,8 +253,6 @@ void printTableTarget(sqlite3 * db, char * sql, int id){
     mytm->tm_hour += 3;
     strftime(curentTime, (size_t)20, "%Y-%m-%d %H:%M:%S", mytm);
 
-    printf("%s\n", curentTime);
-
     if(id > 0) {
         val = selectFromTable(db, sql, id);
     } else val = selectFromTable(db, sql);

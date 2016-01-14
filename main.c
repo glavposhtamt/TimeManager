@@ -73,6 +73,7 @@ int main(int argc, char * argv[]){
         else if(!strcmp(REMOVE, argv[1])) {
             if(!strcmp(ADD_TASK, argv[2])) deleteTask(db, callback, -1);
             else if(!strcmp(ADD_GROUP, argv[2])) deleteGroup(db, callback, -1);
+            else if(!strcmp(ADD_TARGET, argv[2])) sqlQuery(db, callback, "DELETE FROM TARGET;");
         }
             
         else printf("Неверно введена команда!\n");

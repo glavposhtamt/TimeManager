@@ -17,15 +17,18 @@ int main(int argc, char * argv[]){
     /* Info */
 
     const char * info = "\nПользуйся командами:\n"\
-                        "%s ... [%s, %s] - Добавить задачу/группу.\n"\
-                        "%s [taskid] - Удалить задачу.\n"\
-                        "%s [taskid] - Показать.\n"\
-                        "%s [taskid] - Скрыть.\n"\
-                        "%s - Удаление ВСЕХ задач\n"\
-                        "[taskid] - start/pause.\n"\
+                        "%s ... [%s, %s, %s] - Добавить задачу/группу/цель.\n"\
+                        "%s [id] [%s, %s, %s] - Удалить задачу/группу/цель.\n"\
+                        "%s [id] - Показать задачу.\n"\
+                        "%s [id] - Скрыть задачу.\n"\
+                        "%s [%s, %s, %s] - Удаление ВСЕХ задач/групп/целей.\n"\
+                        "[id] - start/pause.\n"\
                         "[taskid] %s [groupid] - Добавить задачу в группу задач.\n"\
                         "%s - Вывести все задачи за все дни.\n"\
-                        "%s - Вывести это сообщение\n\n";
+                        "%s - Вывести это сообщение.\n"\
+                        "%s - Показать группы.\n"\
+                        "%s - Показать цели.\n"\
+                        "%s [groupid] - Отобразить список задач в группе.\n\n";
 
     /* Commands */   
 
@@ -57,6 +60,7 @@ int main(int argc, char * argv[]){
             else if(!strcmp(ADD_TARGET, argv[3]))
                 sqlQuery(db, callback, "DELETE FROM TARGET WHERE ID = %d;", atoi(argv[2]));
         }
+        else printf("Неверно введена команда! Введи ключ info для справки.\n");
     }
 
     else if(argc == 3){
@@ -76,7 +80,7 @@ int main(int argc, char * argv[]){
             else if(!strcmp(ADD_TARGET, argv[2])) sqlQuery(db, callback, "DELETE FROM TARGET;");
         }
             
-        else printf("Неверно введена команда!\n");
+        else printf("Неверно введена команда! Введи ключ info для справки.\n");
     }
     else if(argc == 2) { 
         if(atoi(argv[1]) > 0) startStop(db, callback, atoi(argv[1]));
@@ -87,12 +91,17 @@ int main(int argc, char * argv[]){
         else  if(!strcmp(TARGET, argv[1])) printTableTarget(db, "SELECT ID, DATE, MESSAGE FROM TARGET", 0);
 
         else if(!strcmp(INFO, argv[1])) 
-            printf(info, ADD, ADD_TASK, ADD_GROUP, REMOVE, DISPLAY, UNDISPLAY, REMOVE, ADD, SHOW_ALL, INFO);
+             printf(info, ADD, ADD_TASK, ADD_GROUP, ADD_TARGET,
+                         REMOVE, ADD_TASK, ADD_GROUP, ADD_TARGET,
+                         DISPLAY, UNDISPLAY,
+                         REMOVE, ADD_TASK, ADD_GROUP, ADD_TARGET,
+                         ADD, SHOW_ALL, INFO, GROUP, TARGET, GROUP);
         
-        else printf("Неверно введена команда!\n");
+        else printf("Неверно введена команда! Введи ключ info для справки.\n");
     } 
     else if(argc == 1) printTableTask(db, "SELECT ID, STATUS, MESSAGE FROM TIME WHERE DISPLAY = 1;", 0);
-    else printf(info, ADD, ADD_TASK, ADD_GROUP, REMOVE, DISPLAY, UNDISPLAY, REMOVE, ADD, SHOW_ALL, INFO);
+    else printf("Неверно введена команда! Введи ключ info для справки.\n");
+
                      
    /* Close database */
 

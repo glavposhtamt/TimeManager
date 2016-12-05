@@ -100,8 +100,11 @@ void startStop(sqlite3 * db, fC callback, int id){
 }
 
 
-double getPeriod(char * dateStart, char * dateStop){
-    struct tm tmStart, tmStop;
+double getPeriod(char * dateStart, char * dateStop) {
+    
+    struct tm tmStart = { 0 }, 
+              tmStop = { 0 };
+
     time_t timeStampStart, timeStampStop;
         
     strptime(dateStart, "%Y-%m-%d %H:%M:%S", &tmStart);
@@ -132,7 +135,6 @@ double getTaskTime(sqlite3 * db, char * sql, int id){
     }
     
     freeStructValues(val); 
-   
     return seconds;
 }
 

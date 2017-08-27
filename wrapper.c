@@ -2,15 +2,6 @@
 
 int callback(void * data, int argc, char **argv, char ** azColName){ return 0; }
 
-void formatPercent(char * proxy, char * buff){
-    int i = 0, k = 0;
-    while(proxy[i]){
-        if(proxy[i] == '%' && proxy[i + 1] == '%') i++;
-        buff[k++] = proxy[i++];
-    }
-    buff[k] = '\0';
-}
-
 
 void sqlExec(sqlite3 * db, fC callback, const char * sqlString)
 {
@@ -26,59 +17,13 @@ void sqlExec(sqlite3 * db, fC callback, const char * sqlString)
     }
 }
 
-values * selectFromTable(sqlite3 * db, char * fmt, ...){
-    va_list ap;
-    int rc, nrows, ncols, d, i = 0;
-    char ** result, * errmsg, c, *s, buff[SIZE], proxy[SIZE];
-    values * val = malloc(sizeof(values));
-    
-    va_start(ap, fmt);
+void sqlData(sqlite3 * db, char * sqlString, values * val)
+{
+    int rc, nrows, ncols;
+    char ** result, * errmsg;
 
-     while (*fmt){
-         proxy[i++] = *fmt;
-         if(*fmt++ == '%')
-             switch (*fmt++) {
-             case 's':              /* string */
-                 proxy[i++] = 's';
-                 proxy[i] = '\0';
-                 s = va_arg(ap, char *);
-                 sprintf(buff, proxy, s);
-                 for(i = 0; buff[i] != '\0'; i++) proxy[i] = buff[i];
-                 break;
-             case 'd':              /* int */
-                 proxy[i++] = 'd';
-                 proxy[i] = '\0';
-                 d = va_arg(ap, int);
-                 sprintf(buff, proxy, d);
-                 for(i = 0; buff[i] != '\0'; i++) proxy[i] = buff[i];
+    rc = sqlite3_get_table(db, sqlString, &result, &nrows, &ncols, &errmsg);
 
-                 break;
-             case 'c':              /* char */
-                 /* need a cast here since va_arg only
-                    takes fully promoted types */
-                 proxy[i++] = 'c';
-                 proxy[i] = '\0';
-                 c = (char) va_arg(ap, int);
-                 sprintf(buff, proxy, c);
-                 for(i = 0; buff[i] != '\0'; i++) proxy[i] = buff[i];
-                 break;
-             case '%':
-                 proxy[i++] = '%';
-                 proxy[i++] = *fmt++;
-
-                 break;
-             }
-       }
-
-     proxy[i] = '\0';
-
-     va_end(ap);
-
-     formatPercent(proxy, buff);
-
-    rc = sqlite3_get_table(db, buff, &result, &nrows, &ncols, &errmsg);
-
-    
     if (rc != SQLITE_OK)
     {
         fprintf(stderr, "SQL error: %s\n", errmsg);
@@ -90,9 +35,7 @@ values * selectFromTable(sqlite3 * db, char * fmt, ...){
     {   
         val->result = result;
         val->columns = ncols;
-        val->rows = nrows;
-        
-        return val;        
+        val->rows = nrows;       
     }    
 }
 

@@ -1,18 +1,21 @@
 #include "header.h"
 
-int main(int argc, char * argv[]){
-   sqlite3 * db;
-   int rc;
-   
-   /* Open database */
-    
-   rc = sqlite3_open("time.db", &db);
-   if( rc ){
-      fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-      exit(0);
-   }
+int main(int argc, char * argv[])
+{
+    sqlite3 * db;
+    int rc;
 
-    initTables(db, callback);
+    /* Open database */
+    
+    rc = sqlite3_open("time.db", &db);
+
+    if(rc)
+    {
+       fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+       exit(0);
+    }
+
+    //initTables(db, callback);
 
     /* Info */
 
@@ -87,17 +90,31 @@ int main(int argc, char * argv[]){
             
         else printf("Неверно введена команда! Введи ключ info для справки.\n");
     }
-    else if(argc == 2) { 
-        if(atoi(argv[1]) > 0) startStop(db, callback, atoi(argv[1]));
-        else if(!strcmp(SHOW_ALL, argv[1])) printTableTask(db, "SELECT ID, STATUS, MESSAGE FROM TIME;", 0);
-        else if(!strcmp(UNDISPLAY, argv[1])) {
+    else if (argc == 2) { 
+        if (atoi(argv[1]) > 0)
+        {
+            startStop(db, callback, atoi(argv[1]));
+        }
+        else if (!strcmp(SHOW_ALL, argv[1]))
+        {
+            printTableTask(db, "SELECT ID, STATUS, MESSAGE FROM TIME;", 0);
+        }
+        else if (!strcmp(UNDISPLAY, argv[1]))
+        {
             QUERY(db, callback, "UPDATE TIME SET DISPLAY = 0;");
         }
-        else if(!strcmp(DISPLAY, argv[1])) {
+        else if (!strcmp(DISPLAY, argv[1]))
+        {
             QUERY(db, callback, "UPDATE TIME SET DISPLAY = 1;");
         }
-        else  if(!strcmp(GROUP, argv[1])) printTableGroup(db, "SELECT ID, MESSAGE FROM grouplist WHERE display = 1", 0);
-        else  if(!strcmp(TARGET, argv[1])) printTableTarget(db, "SELECT ID, DATE, MESSAGE FROM TARGET", 0);
+        else if (!strcmp(GROUP, argv[1]))
+        {
+            printTableGroup(db, "SELECT ID, MESSAGE FROM grouplist WHERE display = 1", 0);
+        }
+        else  if (!strcmp(TARGET, argv[1]))
+        {
+            printTableTarget(db, "SELECT ID, DATE, MESSAGE FROM TARGET", 0);
+        }
 
         else if(!strcmp(INFO, argv[1])) 
              printf(info, ADD, ADD_TASK, ADD_GROUP, ADD_TARGET,
@@ -108,7 +125,10 @@ int main(int argc, char * argv[]){
         
         else printf("Неверно введена команда! Введи ключ info для справки.\n");
     } 
-    else if(argc == 1) printTableTask(db, "SELECT ID, STATUS, MESSAGE FROM TIME WHERE DISPLAY = 1;", 0);
+    else if (argc == 1) 
+    {
+        printTableTask(db, "SELECT ID, STATUS, MESSAGE FROM TIME WHERE DISPLAY = 1;", 0);
+    }
     else printf("Неверно введена команда! Введи ключ info для справки.\n");
 
                      

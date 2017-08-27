@@ -87,9 +87,9 @@ void updateStatus(sqlite3 * db, fC callback, int id, int status)
 }
 
 void startStop(sqlite3 * db, fC callback, int id)
-{
-    
-    values * val = selectFromTable(db, "select count(*) as count from TASK where TIMEID = %d AND STOP IS NULL;", id);
+{ 
+    values * val = malloc(sizeof(values));
+    QUERY_SELECT(val, db, "select count(*) as count from TASK where TIMEID = %d AND STOP IS NULL;", id);
     
     int flag = atoi(val->result[1]);
 
@@ -139,7 +139,9 @@ double getTaskTime(sqlite3 * db, char * sql, int id)
     int i, j, proxy;
     double seconds = 0.0;
     
-    values * val = selectFromTable(db, sql, id);
+    values * val = malloc(sizeof(values));
+
+    QUERY_SELECT(val, db, sql, id);
         
     int count = val->columns * val->rows + val->columns;
     
@@ -180,11 +182,16 @@ void printTableTask(sqlite3 * db, char * sql, int id)
 {
     int i, j, timeId;
     double seconds = 0.0;
-    values * val;
+    values * val = malloc(sizeof(values));
 
-    if (id > 0) {
-        val = selectFromTable(db, sql, id);
-    } else val = selectFromTable(db, sql);
+    if (id > 0)
+    {
+        QUERY_SELECT(val, db, sql, id);
+    }
+    else
+    {
+        QUERY_SELECT(val, db, "%s", sql);
+    }
 
     int count = val->columns * val->rows + val->columns;
     
@@ -218,12 +225,17 @@ void printTableTask(sqlite3 * db, char * sql, int id)
 void printTableGroup(sqlite3 * db, char * sql, int id){
     int i, j, k, timeId;
     double seconds = .0, secondsNow = .0;
-    values * val, * ids;
+    values * val = malloc(sizeof(values)),
+          * ids = malloc(sizeof(values));
 
     if (id > 0)
     {
-        val = selectFromTable(db, sql, id);
-    } else val = selectFromTable(db, sql);
+        QUERY_SELECT(val, db, sql, id);
+    }
+    else
+    {
+        QUERY_SELECT(val, db, "%s", sql);
+    }
 
     int count = val->columns * val->rows + val->columns;
 
@@ -233,7 +245,7 @@ void printTableGroup(sqlite3 * db, char * sql, int id){
                 timeId = atoi(val->result[i]);
                 printf("[%d]\t", timeId);
 
-                ids = selectFromTable(db, "SELECT id FROM time WHERE groupid = %d", timeId);
+                QUERY_SELECT(ids, db, "SELECT id FROM time WHERE groupid = %d", timeId);
                 int tcount = ids->columns * ids->rows + ids->columns;
 
                 for (k = ids->columns; k < tcount; k++) {
@@ -274,7 +286,7 @@ void printTableTarget(sqlite3 * db, char * sql, int id)
     int i, j;
     double seconds;
     char curentTime[20];
-    values * val;
+    values * val = malloc(sizeof(values));
     time_t tp;
 
     time(&tp);
@@ -283,9 +295,14 @@ void printTableTarget(sqlite3 * db, char * sql, int id)
     //mytm->tm_hour += 3;
     strftime(curentTime, (size_t)20, "%Y-%m-%d %H:%M:%S", mytm);
 
-    if (id > 0) {
-        val = selectFromTable(db, sql, id);
-    } else val = selectFromTable(db, sql);
+    if (id > 0) 
+    {
+        QUERY_SELECT(val, db, sql, id);
+    }
+    else
+    {
+        QUERY_SELECT(val, db, "%s", sql);
+    }
 
     int count = val->columns * val->rows + val->columns;
 

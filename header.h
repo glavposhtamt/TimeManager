@@ -5,6 +5,10 @@
 #include <string.h>
 #include <time.h>
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+
 #include "wrapper.h"
 
 /* Commands */

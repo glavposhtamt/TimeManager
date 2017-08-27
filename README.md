@@ -1,8 +1,8 @@
-#Install SQLite3 in Ubuntu:
+# Install SQLite3 in Ubuntu:
 
 sudo apt-get install sqlite3 libsqlite3-dev
 
-#Use programm:
+# Use programm:
 
 add ... [-task, -group, -target] - Add task/group/target.
 

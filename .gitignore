@@ -6,3 +6,5 @@ CMakeCache.txt
 libwsql.so
 TimeTracker
 time.db
+time/
+.vscode/

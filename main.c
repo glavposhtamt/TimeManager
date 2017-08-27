@@ -38,7 +38,7 @@ int main(int argc, char * argv[]){
             if(!strcmp(ADD_TASK, argv[3])) table = "TIME";
             else if(!strcmp(ADD_GROUP, argv[3])) table = "GROUPLIST";
             else if(!strcmp(ADD_TARGET, argv[3])){
-                sqlQuery(db, callback, "INSERT INTO TARGET (MESSAGE, DATE) VALUES ('%s', datetime('now'));", argv[2]);
+                QUERY(db, callback, "INSERT INTO TARGET (MESSAGE, DATE) VALUES ('%s', datetime('now'));", argv[2]);
                 sqlite3_close(db);
                 return 0;
             }
@@ -46,11 +46,11 @@ int main(int argc, char * argv[]){
                sqlite3_close(db);
                return 0;
             }
-            sqlQuery(db, callback, "INSERT INTO %s (DISPLAY, MESSAGE) VALUES (1, '%s');", table, argv[2] );
+            QUERY(db, callback, "INSERT INTO %s (DISPLAY, MESSAGE) VALUES (1, '%s');", table, argv[2] );
         }
 
         else if(atoi(argv[1]) && atoi(argv[3]) && !strcmp(ADD, argv[2])){
-            sqlQuery(db, callback, "UPDATE TIME SET GROUPID = %d WHERE ID = %d;",
+            QUERY(db, callback, "UPDATE TIME SET GROUPID = %d WHERE ID = %d;",
                      atoi(argv[3]), atoi(argv[1]) );
         }
 
@@ -58,26 +58,31 @@ int main(int argc, char * argv[]){
             if(!strcmp(ADD_TASK, argv[3])) deleteTask(db, callback, atoi(argv[2]));
             else if(!strcmp(ADD_GROUP, argv[3])) deleteGroup(db, callback, atoi(argv[2]));
             else if(!strcmp(ADD_TARGET, argv[3]))
-                sqlQuery(db, callback, "DELETE FROM TARGET WHERE ID = %d;", atoi(argv[2]));
+                QUERY(db, callback, "DELETE FROM TARGET WHERE ID = %d;", atoi(argv[2]));
         }
         else printf("Неверно введена команда! Введи ключ info для справки.\n");
     }
 
     else if(argc == 3){
 
-        if(!strcmp(DISPLAY, argv[1]))
-            sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 1 WHERE ID = %d;", atoi(argv[2]));
+        if(!strcmp(DISPLAY, argv[1])) {
+            QUERY(db, callback, "UPDATE TIME SET DISPLAY = 1 WHERE ID = %d;", atoi(argv[2]));
+        }
+            
+        else if(!strcmp(UNDISPLAY, argv[1])) {
+            QUERY(db, callback, "UPDATE TIME SET DISPLAY = 0 WHERE ID = %d;", atoi(argv[2]));
+        }
 
-        else if(!strcmp(UNDISPLAY, argv[1]))
-            sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 0 WHERE ID = %d;", atoi(argv[2]));
-
-        else if(!strcmp(GROUP, argv[1]))
+        else if(!strcmp(GROUP, argv[1])) {
             printTableTask(db, "SELECT ID, STATUS, MESSAGE FROM TIME WHERE GROUPID = %d;", atoi(argv[2]));
+        }
 
         else if(!strcmp(REMOVE, argv[1])) {
             if(!strcmp(ADD_TASK, argv[2])) deleteTask(db, callback, -1);
             else if(!strcmp(ADD_GROUP, argv[2])) deleteGroup(db, callback, -1);
-            else if(!strcmp(ADD_TARGET, argv[2])) sqlQuery(db, callback, "DELETE FROM TARGET;");
+            else if(!strcmp(ADD_TARGET, argv[2])) {
+                QUERY(db, callback, "DELETE FROM TARGET;");
+            }
         }
             
         else printf("Неверно введена команда! Введи ключ info для справки.\n");
@@ -85,8 +90,12 @@ int main(int argc, char * argv[]){
     else if(argc == 2) { 
         if(atoi(argv[1]) > 0) startStop(db, callback, atoi(argv[1]));
         else if(!strcmp(SHOW_ALL, argv[1])) printTableTask(db, "SELECT ID, STATUS, MESSAGE FROM TIME;", 0);
-        else if(!strcmp(UNDISPLAY, argv[1])) sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 0;");
-        else if(!strcmp(DISPLAY, argv[1])) sqlQuery(db, callback, "UPDATE TIME SET DISPLAY = 1;");
+        else if(!strcmp(UNDISPLAY, argv[1])) {
+            QUERY(db, callback, "UPDATE TIME SET DISPLAY = 0;");
+        }
+        else if(!strcmp(DISPLAY, argv[1])) {
+            QUERY(db, callback, "UPDATE TIME SET DISPLAY = 1;");
+        }
         else  if(!strcmp(GROUP, argv[1])) printTableGroup(db, "SELECT ID, MESSAGE FROM grouplist WHERE display = 1", 0);
         else  if(!strcmp(TARGET, argv[1])) printTableTarget(db, "SELECT ID, DATE, MESSAGE FROM TARGET", 0);
 

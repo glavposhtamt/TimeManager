@@ -1,36 +1,35 @@
 #include "header.h"
 
-void initTables(sqlite3 * db, fC callback){
-
-   char * group = "CREATE TABLE IF NOT EXISTS GROUPLIST (" \
+void initTables(sqlite3 * db, fC callback)
+{
+    char * group = "CREATE TABLE IF NOT EXISTS GROUPLIST (" \
                       "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                       "DISPLAY  INTEGER          NOT NULL,"\
                       "MESSAGE  CHAR(100)        NOT NULL);";
 
-   char * time = "CREATE TABLE IF NOT EXISTS TIME (" \
+    char * time = "CREATE TABLE IF NOT EXISTS TIME (" \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                     "MESSAGE  CHAR(100)        NOT NULL," \
                     "DISPLAY  INTEGER          NOT NULL," \
                     "GROUPID  INTEGER          DEFAULT 0,"\
                     "STATUS   INTEGER          DEFAULT 0);";
     
-  char * task = "CREATE TABLE IF NOT EXISTS TASK ("  \
+    char * task = "CREATE TABLE IF NOT EXISTS TASK ("  \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                     "TIMEID   INTEGER          NOT NULL," \
                     "START    datetime         NOT NULL," \
                     "STOP     datetime," \
                     "FOREIGN KEY(TIMEID) REFERENCES TIME(ID));";
 
-  char * target = "CREATE TABLE IF NOT EXISTS TARGET ("  \
+    char * target = "CREATE TABLE IF NOT EXISTS TARGET ("  \
                     "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
                     "MESSAGE  CHAR(100)        NOT NULL," \
                     "DATE     datetime         NOT NULL);";
 
-   sqlQuery(db, callback, time);    
-   sqlQuery(db, callback, task);
-   sqlQuery(db, callback, group);
-   sqlQuery(db, callback, target);
-
+    QUERY(db, callback, "%s", time);    
+    QUERY(db, callback, "%s", task);
+    QUERY(db, callback, "%s", group);
+    QUERY(db, callback, "%s", target);
   }
 
 
@@ -41,30 +40,39 @@ void deleteTask(sqlite3 * db, fC callback, int id){
     * 1 - remove all
     */ 
     
-   if(id && id > 0)
-        sqlQuery(db, callback, "DELETE FROM TIME WHERE ID = %d; DELETE FROM TASK WHERE TIMEID = %d;", id, id);
+    if (id && id > 0)
+    {
+        QUERY(db, callback, "DELETE FROM TIME WHERE ID = %d; DELETE FROM TASK WHERE TIMEID = %d;", id, id);
+    }
 
     else if(id == -1)
-        sqlQuery(db, callback, "DELETE FROM TIME; DELETE FROM TASK;");    
+    {
+        QUERY(db, callback, "DELETE FROM TIME; DELETE FROM TASK;");
+    }  
 
 }
 
-void deleteGroup(sqlite3 * db, fC callback, int id){
+void deleteGroup(sqlite3 * db, fC callback, int id)
+{
    /*
     * int id:
     * 0 - remove row
     * 1 - remove all
     */
 
-   if(id && id > 0)
-        sqlQuery(db, callback, "DELETE FROM GROUPLIST WHERE ID = %d;", id);
+    if (id && id > 0)
+    {
+        QUERY(db, callback, "DELETE FROM GROUPLIST WHERE ID = %d;", id);
+    }
 
-    else if(id == -1)
-        sqlQuery(db, callback, "DELETE FROM GROUPLIST;");
-
+    else if (id == -1)
+    {
+        QUERY(db, callback, "DELETE FROM GROUPLIST;");
+    }
 }
 
-void updateStatus(sqlite3 * db, fC callback, int id, int status){
+void updateStatus(sqlite3 * db, fC callback, int id, int status)
+{
     
     /*
      * int status:
@@ -75,10 +83,11 @@ void updateStatus(sqlite3 * db, fC callback, int id, int status){
     char * query = status ? "UPDATE TIME SET STATUS = 1 WHERE ID = %d;"
                           : "UPDATE TIME SET STATUS = 0 WHERE ID = %d;";
 
-    sqlQuery(db, callback, query, id);
+    QUERY(db, callback, query, id);
 }
 
-void startStop(sqlite3 * db, fC callback, int id){
+void startStop(sqlite3 * db, fC callback, int id)
+{
     
     values * val = selectFromTable(db, "select count(*) as count from TASK where TIMEID = %d AND STOP IS NULL;", id);
     
@@ -91,17 +100,26 @@ void startStop(sqlite3 * db, fC callback, int id){
      * flag == FALSE - INSERT
      * flag == TRUE  - UPDATE
      */ 
+
     foreignKey(db, 1);
-    if(!flag) sqlQuery(db, callback, "INSERT INTO TASK (TIMEID, START) VALUES (%d, datetime('now'));", id);
-    else sqlQuery(db, callback, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d AND STOP IS NULL;", id);
+    
+    if(!flag)
+    {
+        QUERY(db, callback, "INSERT INTO TASK (TIMEID, START) VALUES (%d, datetime('now'));", id);
+    }
+    else
+    {
+        QUERY(db, callback, "UPDATE TASK SET STOP = datetime('now') WHERE TIMEID = %d AND STOP IS NULL;", id);
+    }
+
     foreignKey(db, 0);
 
     freeStructValues(val);
 }
 
 
-double getPeriod(char * dateStart, char * dateStop) {
-    
+double getPeriod(char * dateStart, char * dateStop)
+{
     struct tm tmStart = { 0 }, 
               tmStop = { 0 };
 
@@ -116,7 +134,8 @@ double getPeriod(char * dateStart, char * dateStop) {
     return difftime(timeStampStop, timeStampStart);
 }
 
-double getTaskTime(sqlite3 * db, char * sql, int id){
+double getTaskTime(sqlite3 * db, char * sql, int id)
+{
     int i, j, proxy;
     double seconds = 0.0;
     
@@ -138,7 +157,8 @@ double getTaskTime(sqlite3 * db, char * sql, int id){
     return seconds;
 }
 
-cl secToTime(double seconds){
+cl secToTime(double seconds)
+{
     long s = (long)seconds;
     int allMin;
     cl hms;
@@ -151,33 +171,39 @@ cl secToTime(double seconds){
     return hms;
 }
 
-int secToDays(double seconds){
+int secToDays(double seconds)
+{
     return (int)seconds / 60 / 60 / 24;
 }
 
-void printTableTask(sqlite3 * db, char * sql, int id){
+void printTableTask(sqlite3 * db, char * sql, int id)
+{
     int i, j, timeId;
     double seconds = 0.0;
     values * val;
 
-    if(id > 0) {
+    if (id > 0) {
         val = selectFromTable(db, sql, id);
     } else val = selectFromTable(db, sql);
 
     int count = val->columns * val->rows + val->columns;
     
     for (i = val->columns, j = 1; i < count; i++) {
-        if(j == 1) {
+        if (j == 1)
+        {
           timeId = atoi(val->result[i]);
           printf("[%d]\t", timeId);
           j++;
           continue;
         } 
 
-        if(j == val->columns) {
+        if (j == val->columns)
+        {
             printf("%s\n", val->result[i]);
             j = 1;
-        } else {
+        }
+        else
+        {
             seconds = getTaskTime(db, "select START, STOP from TASK where TIMEID = %d;", timeId);
             cl hms = secToTime(seconds);
             printf("%.2d:%.2d:%.2d\t", hms.hours, hms.min, hms.sec);
@@ -194,7 +220,8 @@ void printTableGroup(sqlite3 * db, char * sql, int id){
     double seconds = .0, secondsNow = .0;
     values * val, * ids;
 
-    if(id > 0) {
+    if (id > 0)
+    {
         val = selectFromTable(db, sql, id);
     } else val = selectFromTable(db, sql);
 
@@ -225,7 +252,7 @@ void printTableGroup(sqlite3 * db, char * sql, int id){
                 j = 1;
                 break;
        }
-        if(j == 2){
+        if (j == 2) {
             cl hms = secToTime(seconds);
             cl hmsNow = secToTime(secondsNow);
 
@@ -242,7 +269,8 @@ void printTableGroup(sqlite3 * db, char * sql, int id){
     freeStructValues(val);
 }
 
-void printTableTarget(sqlite3 * db, char * sql, int id){
+void printTableTarget(sqlite3 * db, char * sql, int id)
+{
     int i, j;
     double seconds;
     char curentTime[20];
@@ -255,14 +283,15 @@ void printTableTarget(sqlite3 * db, char * sql, int id){
     //mytm->tm_hour += 3;
     strftime(curentTime, (size_t)20, "%Y-%m-%d %H:%M:%S", mytm);
 
-    if(id > 0) {
+    if (id > 0) {
         val = selectFromTable(db, sql, id);
     } else val = selectFromTable(db, sql);
 
     int count = val->columns * val->rows + val->columns;
 
     for (i = val->columns, j = 1; i < count; i++) {
-        switch(j){
+        switch (j)
+        {
             case 1:
                 printf("[%d]\t", atoi(val->result[i]));
                 j++;

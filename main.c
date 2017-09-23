@@ -97,7 +97,8 @@ int main(int argc, char * argv[])
         }
         else if (!strcmp(SHOW_ALL, argv[1]))
         {
-            printTableTask(db, "SELECT ID, STATUS, MESSAGE FROM TIME;", 0);
+            printTableTask(db, "SELECT time.id, status, date(start) AS date, message "
+                               "FROM time INNER JOIN task ON task.timeid = time.id ORDER BY time.id;", 0);
         }
         else if (!strcmp(UNDISPLAY, argv[1]))
         {

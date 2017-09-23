@@ -11,6 +11,9 @@
 
 #include "wrapper.h"
 
+/* Non meta columns count (first columns) */
+#define DISPLAY_FIRST_COLUMNS 5
+
 /* Commands */
 
 #define ADD           "add"
@@ -28,13 +31,28 @@
 #define ADD_TASK     "-task"
 #define ADD_TARGET   "-target"
 
-/* fC is int (* fC)(void *, int, char **, char **) */
-
 typedef struct Clock {
     int sec;
     int min;
     int hours;
 } cl;
+
+typedef struct TimeModel {
+    int id;
+    int status;
+    double seconds;
+    char * date;
+    char * task;
+    int count;
+    
+    // struct values pointer (init source)
+    values * _v;
+} tmodel;
+
+/* Is not  */
+
+
+/* fC is pointer: int (* fC)(void *, int, char **, char **) */
 
 extern void initTables(sqlite3 * db, fC);
 extern void deleteTask(sqlite3 * db, fC, int);

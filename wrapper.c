@@ -17,6 +17,9 @@ void sqlExec(sqlite3 * db, fC callback, const char * sqlString)
     }
 }
 
+/*
+ *  struct values init
+ */
 void sqlData(sqlite3 * db, char * sqlString, values * val)
 {
     int rc, nrows, ncols;

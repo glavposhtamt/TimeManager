@@ -161,7 +161,7 @@ tmodel ** initTmodel(sqlite3 * db, int timeid)
 
         switch (columnN)
         {
-            // ID
+            // ID, _v
             case 1:
                 id = atoi(val->result[i]);
                 if (!uid || id != uid)
@@ -170,6 +170,7 @@ tmodel ** initTmodel(sqlite3 * db, int timeid)
                     aTmodel[j] = malloc(sizeof(tmodel));
                     aTmodel[j]->_v = val;
                     aTmodel[j]->id = id;
+                    // valgrind like there
                     aTmodel[j]->seconds = 0;
                     uid = id;
                 }

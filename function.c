@@ -2,28 +2,29 @@
 
 void initTables(sqlite3 * db, fC callback)
 {
-    char * group = "CREATE TABLE IF NOT EXISTS GROUPLIST (" \
-                      "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-                      "DISPLAY  INTEGER          NOT NULL,"\
+    char * group = "CREATE TABLE IF NOT EXISTS GROUPLIST ("
+                      "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," 
+                      "DISPLAY  INTEGER          NOT NULL,"
                       "MESSAGE  CHAR(100)        NOT NULL);";
 
-    char * time = "CREATE TABLE IF NOT EXISTS TIME (" \
-                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-                    "MESSAGE  CHAR(100)        NOT NULL," \
-                    "DISPLAY  INTEGER          NOT NULL," \
-                    "GROUPID  INTEGER          DEFAULT 0,"\
+    char * time = "CREATE TABLE IF NOT EXISTS TIME ("
+                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+                    "DATE     date             NOT NULL,"
+                    "MESSAGE  CHAR(100)        NOT NULL," 
+                    "DISPLAY  INTEGER          NOT NULL,"
+                    "GROUPID  INTEGER          DEFAULT 0,"
                     "STATUS   INTEGER          DEFAULT 0);";
     
-    char * task = "CREATE TABLE IF NOT EXISTS TASK ("  \
-                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-                    "TIMEID   INTEGER          NOT NULL," \
-                    "START    datetime         NOT NULL," \
-                    "STOP     datetime," \
+    char * task = "CREATE TABLE IF NOT EXISTS TASK ("
+                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+                    "TIMEID   INTEGER          NOT NULL,"
+                    "START    datetime         NOT NULL,"
+                    "STOP     datetime,"
                     "FOREIGN KEY(TIMEID) REFERENCES TIME(ID));";
 
-    char * target = "CREATE TABLE IF NOT EXISTS TARGET ("  \
-                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
-                    "MESSAGE  CHAR(100)        NOT NULL," \
+    char * target = "CREATE TABLE IF NOT EXISTS TARGET ("
+                    "ID       INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+                    "MESSAGE  CHAR(100)        NOT NULL,"
                     "DATE     datetime         NOT NULL);";
 
     QUERY(db, callback, "%s", time);    
@@ -135,13 +136,12 @@ double getPeriod(char * dateStart, char * dateStop)
 
 tmodel ** initTmodel(sqlite3 * db, int timeid)
 {
-    int i, j, columnN, uid = 0, id, all = 0;
-    double seconds = 0.0;
+    int i, j, columnN, uid = 0, id;
     char * start;
     values * val = malloc(sizeof(values));
 
-    const char * sql =  "SELECT time.id, status, date(start) AS DATE, message, start, stop "
-                        "FROM time INNER JOIN task ON task.timeid = time.id ORDER BY time.id;";
+    const char * sql =  "SELECT time.id, status, date, message, start, stop "
+                        "FROM time LEFT JOIN task ON task.timeid = time.id ORDER BY time.id;";
 
     // Init values struct
     if (timeid > 0)
@@ -157,73 +157,65 @@ tmodel ** initTmodel(sqlite3 * db, int timeid)
     tmodel ** aTmodel = malloc(sizeof(tmodel *) * val->rows);
     int count = val->columns * val->rows + val->columns;
     
-    for (i = val->columns, columnN = 1, j = 0; i < count; i++) {
+    for (i = val->columns, j = 0, columnN = 1; i < count; i++) {
 
-        if (columnN == 1)
+        switch (columnN)
         {
-            id = atoi(val->result[i]);
-        }
+            // ID
+            case 1:
+                id = atoi(val->result[i]);
+                if (!uid || id != uid)
+                {
+                    j = uid ? j + 1 : 0;
+                    aTmodel[j] = malloc(sizeof(tmodel));
+                    aTmodel[j]->_v = val;
+                    aTmodel[j]->id = id;
+                    uid = id;
+                }
+                if (id == (count - val->columns))
+                {
+                    aTmodel[j]->id = id;
+                }
 
-        // Always first executed branch
-        if (id != uid)
-        {
-            // ID & SECONDS & _v
-            if (i != val->columns && columnN == 1)
-            {
-                aTmodel[j]->_v = val;
-                aTmodel[j]->id = uid;
-                aTmodel[j]->seconds = seconds;
-                seconds = 0.0;
-                j++;
-            }
+                columnN++;
+                continue;
 
-            aTmodel[j] = malloc(sizeof(tmodel));
-            ++all;
-            uid = id;
-            columnN++;
-            continue;
-        }
-        else
-        {
-            switch (columnN)
-            {
-                case 1:
-                    columnN++;
-                    continue;
+            // STATUS
+            case 2:
+                aTmodel[j]->status = atoi(val->result[i]);
+                columnN++;
+                continue;
 
-                // STATUS
-                case 2:
-                    aTmodel[j]->status = atoi(val->result[i]);
-                    columnN++;
-                    continue;
+            // DATE
+            case 3:
+                aTmodel[j]->date = val->result[i];
+                columnN++;
+                continue;
+            
+            // TASK
+            case 4: 
+                aTmodel[j]->task = val->result[i];
+                columnN++;
+                continue;
 
-                // DATE
-                case 3:
-                    aTmodel[j]->date = val->result[i];
-                    columnN++;
-                    continue;
-                
-                // TASK
-                case 4: 
-                    aTmodel[j]->task = val->result[i];
-                    columnN++;
-                    continue;
-
-                // START & STOP
-                case 5: 
-                    start = val->result[i];
-                    ++i;
-                    if (val->result[i] != NULL)
-                    {
-                        seconds += getPeriod(start, val->result[i]);
-                    }
-                    columnN = 1;
-                    continue;
-            }
+            // SECONDS
+            case 5: 
+                start = val->result[i];
+                ++i;
+                if (val->result[i] != NULL)
+                {
+                    aTmodel[j]->seconds += getPeriod(start, val->result[i]);
+                }
+                columnN = 1;
+                continue;
         }
     }
-
-    aTmodel[++j] = NULL;
+    
+    // Last init after for
+    if (j)
+    {
+        aTmodel[++j] = NULL;
+    }
 
     return aTmodel;
 }
@@ -234,10 +226,11 @@ void freeStructTmodel(tmodel ** tmodel)
     
     freeStructValues((*tmodel)->_v);
 
-    do {
+    while(tmodel[i])
+    {
         free(tmodel[i]);
         ++i;
-    } while(tmodel[i]);
+    }
 
     free(tmodel);
 }
@@ -271,7 +264,7 @@ cl secToTime(double seconds)
 {
     long s = (long)seconds;
     int allMin;
-    cl hms;
+    cl hms = { 0 };
 
     hms.sec = s >= 60 ? s % 60 : s;
     allMin = s / 60;
@@ -289,49 +282,21 @@ int secToDays(double seconds)
 void printTableTask(sqlite3 * db, char * sql, int id)
 {
     tmodel ** tmodel = initTmodel(db, 0);
-    
+    int i = 0;
+    cl hms = { 0 };
+
+    while(tmodel[i])
+    {
+        hms = secToTime(tmodel[i]->seconds);
+
+        printf("[%d]\t%.2d:%.2d:%.2d\t%s\t%s\t%s\n", 
+            tmodel[i]->id, hms.hours, hms.min, hms.sec, 
+            tmodel[i]->status ? "Start" : "Pause", tmodel[i]->date, tmodel[i]->task);
+
+        ++i;
+    }
+
     freeStructTmodel(tmodel);
-
-    // int i, j, timeId;
-    // double seconds = 0.0;
-    // values * val = malloc(sizeof(values));
-
-    // if (id > 0)
-    // {
-    //     QUERY_SELECT(val, db, sql, id);
-    // }
-    // else
-    // {
-    //     QUERY_SELECT(val, db, "%s", sql);
-    // }
-
-    // int count = val->columns * val->rows + val->columns;
-    
-    // for (i = val->columns, j = 1; i < count; i++) {
-    //     if (j == 1)
-    //     {
-    //       timeId = atoi(val->result[i]);
-    //       printf("[%d]\t", timeId);
-    //       j++;
-    //       continue;
-    //     } 
-
-    //     if (j == val->columns)
-    //     {
-    //         printf("%s\n", val->result[i]);
-    //         j = 1;
-    //     }
-    //     else
-    //     {
-    //         seconds = getTaskTime(db, "select START, STOP from TASK where TIMEID = %d;", timeId);
-    //         cl hms = secToTime(seconds);
-    //         printf("%.2d:%.2d:%.2d\t", hms.hours, hms.min, hms.sec);
-    //         printf("%s\t", atoi(val->result[i]) ? "Start" : "Pause");
-    //         j++;
-    //     }
-    // }
-
-    // freeStructValues(val);   
 }
 
 void printTableGroup(sqlite3 * db, char * sql, int id){

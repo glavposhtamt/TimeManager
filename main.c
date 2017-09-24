@@ -15,7 +15,7 @@ int main(int argc, char * argv[])
        exit(0);
     }
 
-    //initTables(db, callback);
+    initTables(db, callback);
 
     /* Info */
 
@@ -49,7 +49,7 @@ int main(int argc, char * argv[])
                sqlite3_close(db);
                return 0;
             }
-            QUERY(db, callback, "INSERT INTO %s (DISPLAY, MESSAGE) VALUES (1, '%s');", table, argv[2] );
+            QUERY(db, callback, "INSERT INTO %s (DISPLAY, DATE, MESSAGE) VALUES (1, date('now'), '%s');", table, argv[2]);
         }
 
         else if(atoi(argv[1]) && atoi(argv[3]) && !strcmp(ADD, argv[2])){

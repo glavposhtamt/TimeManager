@@ -22,6 +22,7 @@
 #define UNDISPLAY     "undisp"
 #define SHOW_ALL      "all"
 #define INFO          "info"
+#define INIT          "init"
 #define GROUP         "gr"
 #define TARGET        "tg"
 

@@ -154,7 +154,13 @@ tmodel ** initTmodel(sqlite3 * db, int timeid)
     }
 
     // Init tmodel struct
-    tmodel ** aTmodel = malloc(sizeof(tmodel *) * val->rows);
+    if (!val->rows)
+    {
+        freeStructValues(val);
+        return NULL;
+    }
+
+    tmodel ** aTmodel = calloc(val->rows, sizeof(tmodel *));
     int count = val->columns * val->rows + val->columns;
     
     for (i = val->columns, j = 0, columnN = 1; i < count; i++) {
@@ -216,7 +222,7 @@ tmodel ** initTmodel(sqlite3 * db, int timeid)
     // Last init after for
     if (j)
     {
-        aTmodel[++j] = NULL;
+        aTmodel[j] = NULL;
     }
 
     return aTmodel;
@@ -224,6 +230,11 @@ tmodel ** initTmodel(sqlite3 * db, int timeid)
 
 void freeStructTmodel(tmodel ** tmodel)
 {
+    if (!tmodel)
+    {
+        return;
+    }
+    
     int i = 0;
     
     freeStructValues((*tmodel)->_v);
@@ -287,7 +298,7 @@ void printTableTask(sqlite3 * db, char * sql, int id)
     int i = 0;
     cl hms = { 0 };
 
-    while(tmodel[i])
+    while(tmodel && tmodel[i])
     {
         hms = secToTime(tmodel[i]->seconds);
 

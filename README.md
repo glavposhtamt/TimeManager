@@ -22,6 +22,8 @@ all - All task.
 
 info - This message.
 
+init - Create sqlite3 DB.
+
 gr - Show groups.
 
 tg - Show targets.

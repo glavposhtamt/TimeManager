@@ -15,22 +15,21 @@ int main(int argc, char * argv[])
        exit(0);
     }
 
-    initTables(db, callback);
-
     /* Info */
 
-    const char * info = "\nПользуйся командами:\n"\
-                        "%s ... [%s, %s, %s] - Добавить задачу/группу/цель.\n"\
-                        "%s [id] [%s, %s, %s] - Удалить задачу/группу/цель.\n"\
-                        "%s [id] - Показать задачу.\n"\
-                        "%s [id] - Скрыть задачу.\n"\
-                        "%s [%s, %s, %s] - Удаление ВСЕХ задач/групп/целей.\n"\
-                        "[id] - start/pause.\n"\
-                        "[taskid] %s [groupid] - Добавить задачу в группу задач.\n"\
-                        "%s - Вывести все задачи за все дни.\n"\
-                        "%s - Вывести это сообщение.\n"\
-                        "%s - Показать группы.\n"\
-                        "%s - Показать цели.\n"\
+    const char * info = "\nПользуйся командами:\n"
+                        "%s ... [%s, %s, %s] - Добавить задачу/группу/цель.\n"
+                        "%s [id] [%s, %s, %s] - Удалить задачу/группу/цель.\n"
+                        "%s [id] - Показать задачу.\n"
+                        "%s [id] - Скрыть задачу.\n"
+                        "%s [%s, %s, %s] - Удаление ВСЕХ задач/групп/целей.\n"
+                        "[id] - start/pause.\n"
+                        "[taskid] %s [groupid] - Добавить задачу в группу задач.\n"
+                        "%s - Вывести все задачи за все дни.\n"
+                        "%s - Вывести это сообщение.\n"
+                        "%s - Инициализировать sqlite3 базу данных.\n"
+                        "%s - Показать группы.\n"
+                        "%s - Показать цели.\n"
                         "%s [groupid] - Отобразить список задач в группе.\n\n";
 
     /* Commands */   
@@ -122,7 +121,12 @@ int main(int argc, char * argv[])
                          REMOVE, ADD_TASK, ADD_GROUP, ADD_TARGET,
                          DISPLAY, UNDISPLAY,
                          REMOVE, ADD_TASK, ADD_GROUP, ADD_TARGET,
-                         ADD, SHOW_ALL, INFO, GROUP, TARGET, GROUP);
+                         ADD, SHOW_ALL, INFO, INIT, GROUP, TARGET, GROUP);
+
+        else if(!strcmp(INIT, argv[1])) 
+        {
+            initTables(db, callback);
+        }
         
         else printf("Неверно введена команда! Введи ключ info для справки.\n");
     } 

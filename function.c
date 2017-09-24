@@ -170,6 +170,7 @@ tmodel ** initTmodel(sqlite3 * db, int timeid)
                     aTmodel[j] = malloc(sizeof(tmodel));
                     aTmodel[j]->_v = val;
                     aTmodel[j]->id = id;
+                    aTmodel[j]->seconds = 0;
                     uid = id;
                 }
                 if (id == (count - val->columns))

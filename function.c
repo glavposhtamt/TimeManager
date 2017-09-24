@@ -135,7 +135,7 @@ double getPeriod(char * dateStart, char * dateStop)
 
 tmodel ** initTmodel(sqlite3 * db, int timeid)
 {
-    int i, j, columnN, uid = 0, id;
+    int i, j, columnN, uid = 0, id, all = 0;
     double seconds = 0.0;
     char * start;
     values * val = malloc(sizeof(values));
@@ -178,6 +178,7 @@ tmodel ** initTmodel(sqlite3 * db, int timeid)
             }
 
             aTmodel[j] = malloc(sizeof(tmodel));
+            ++all;
             uid = id;
             columnN++;
             continue;
@@ -222,24 +223,21 @@ tmodel ** initTmodel(sqlite3 * db, int timeid)
         }
     }
 
-    j++;
-    for (i = 0; i <= j; i++) {
-        aTmodel[i]->count = j;
-    }
+    aTmodel[++j] = NULL;
 
     return aTmodel;
 }
 
 void freeStructTmodel(tmodel ** tmodel)
 {
-    int i = 0, rc = (*tmodel)->count;
+    int i = 0;
     
     freeStructValues((*tmodel)->_v);
 
-    for (; i < rc; i++)
-    {
+    do {
         free(tmodel[i]);
-    }
+        ++i;
+    } while(tmodel[i]);
 
     free(tmodel);
 }
@@ -290,12 +288,7 @@ int secToDays(double seconds)
 
 void printTableTask(sqlite3 * db, char * sql, int id)
 {
-    int i = 0;
     tmodel ** tmodel = initTmodel(db, 0);
-
-    for (; i < (*tmodel)->count; i++) {
-        printf("[%s]\n", tmodel[i]->task);
-    }
     
     freeStructTmodel(tmodel);
 

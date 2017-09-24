@@ -43,7 +43,6 @@ typedef struct TimeModel {
     double seconds;
     char * date;
     char * task;
-    int count;
     
     // struct values pointer (init source)
     values * _v;

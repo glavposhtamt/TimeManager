@@ -134,6 +134,11 @@ double getPeriod(char * dateStart, char * dateStop)
     return difftime(timeStampStop, timeStampStart);
 }
 
+/*   @TODO:
+      SELECT time.id, status, date, message, SUM(Cast((JulianDay(stop) - JulianDay(start)) * 24 * 60 * 60 As Integer)) as seconds
+      FROM time JOIN task ON task.timeid = time.id; 
+ */
+
 tmodel ** initTmodel(sqlite3 * db, int timeid)
 {
     int i, j, columnN, uid = 0, id;

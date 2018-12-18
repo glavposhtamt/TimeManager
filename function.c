@@ -136,7 +136,11 @@ double getPeriod(char * dateStart, char * dateStop)
 
 /*   @TODO:
     SELECT * FROM
-      (SELECT time.id, status, date, message, SUM(Cast((JulianDay(stop) - JulianDay(start)) * 24 * 60 * 60 As Integer)) as seconds
+      (SELECT time.id, status, date, message,
+        IFNULL(
+            SUM(Cast((JulianDay(stop) - JulianDay(start)) * 24 * 60 * 60 As Integer)),
+            SUM(Cast((JulianDay() - JulianDay(start)) * 24 * 60 * 60 As Integer))
+        ) as seconds
       FROM time INNER JOIN task ON task.timeid = time.id GROUP BY time.id
       UNION ALL
       SELECT id, status, date, message, 0 as seconds FROM time

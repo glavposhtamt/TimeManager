@@ -11,7 +11,7 @@
 
 /* Size string buffer */
 
-#define SIZE 256
+#define SIZE 512
 #define QUERY(db, callback, ...) { char buff[SIZE]; sprintf(buff, __VA_ARGS__);\
      sqlExec(db, callback, buff); }
      

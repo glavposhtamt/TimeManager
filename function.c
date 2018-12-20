@@ -118,172 +118,92 @@ void startStop(sqlite3 * db, fC callback, int id)
     freeStructValues(val);
 }
 
-double getPeriod(char * dateStart, char * dateStop)
-{
-    struct tm tmStart = { 0 }, 
-              tmStop = { 0 };
-
-    time_t timeStampStart, timeStampStop;
-        
-    strptime(dateStart, "%Y-%m-%d %H:%M:%S", &tmStart);
-    strptime(dateStop, "%Y-%m-%d %H:%M:%S", &tmStop);
-
-    timeStampStart = mktime(&tmStart);
-    timeStampStop = mktime(&tmStop);
-        
-    return difftime(timeStampStop, timeStampStart);
-}
-
-/*   @TODO:
+/*   @SQL:
     SELECT * FROM
-      (SELECT time.id, status, date, message,
+      (SELECT time.id, status,
         IFNULL(
             SUM(Cast((JulianDay(stop) - JulianDay(start)) * 24 * 60 * 60 As Integer)),
             SUM(Cast((JulianDay() - JulianDay(start)) * 24 * 60 * 60 As Integer))
-        ) as seconds
+        ) as seconds, date, message
       FROM time INNER JOIN task ON task.timeid = time.id GROUP BY time.id
       UNION ALL
-      SELECT id, status, date, message, 0 as seconds FROM time
+      SELECT id, status, 0 as seconds, date, message FROM time
       WHERE id NOT IN(SELECT timeid FROM task)) ORDER BY id;
  */
 
-tmodel ** initTmodel(sqlite3 * db, int timeid)
+values * getAllTasks(sqlite3 * db)
 {
-    int i, j, columnN, uid = 0, id;
-    char * start;
+    const char * sql =
+        "SELECT * FROM\
+        (SELECT time.id, status,\
+            IFNULL(\
+                SUM(Cast((JulianDay(stop) - JulianDay(start)) * 24 * 60 * 60 As Integer)),\
+                SUM(Cast((JulianDay() - JulianDay(start)) * 24 * 60 * 60 As Integer))\
+            ) as seconds, date, message\
+        FROM time INNER JOIN task ON task.timeid = time.id GROUP BY time.id\
+        UNION ALL\
+        SELECT id, status, 0 as seconds, date, message FROM time\
+        WHERE id NOT IN(SELECT timeid FROM task)) ORDER BY id;";
+
     values * val = malloc(sizeof(values));
+    QUERY_SELECT(val, db, "%s", sql);
 
-    const char * sql =  "SELECT time.id, status, date, message, start, stop "
-                        "FROM time LEFT JOIN task ON task.timeid = time.id ORDER BY time.id;";
+    return val;
+}
 
-    // Init values struct
-    if (timeid > 0)
-    {
-        QUERY_SELECT(val, db, sql, timeid);
-    }
-    else
-    {
-        QUERY_SELECT(val, db, "%s", sql);
-    }
+void printTable(values * val)
+{
+    int i, columnN;
+    cl hms = { 0 };
 
     // Init tmodel struct
     if (!val->rows)
     {
         freeStructValues(val);
-        return NULL;
+        return;
     }
 
-    tmodel ** aTmodel = calloc(val->rows, sizeof(tmodel *));
     int count = val->columns * val->rows + val->columns;
     
-    for (i = val->columns, j = 0, columnN = 1; i < count; i++) {
+    for (i = val->columns, columnN = 1; i < count; i++) {
 
         switch (columnN)
         {
-            // ID, _v
+            // ID, "[%d]\t%.2d:%.2d:%.2d\t%s\t%s\t%s\n"
             case 1:
-                id = atoi(val->result[i]);
-                if (!uid || id != uid)
-                {
-                    j = uid ? j + 1 : 0;
-                    aTmodel[j] = malloc(sizeof(tmodel));
-                    aTmodel[j]->_v = val;
-                    aTmodel[j]->id = id;
-                    // valgrind like there
-                    aTmodel[j]->seconds = 0;
-                    uid = id;
-                }
-                if (id == (count - val->columns))
-                {
-                    aTmodel[j]->id = id;
-                }
-
+                printf("[%s]\t", val->result[i]);
                 columnN++;
                 continue;
 
             // STATUS
             case 2:
-                aTmodel[j]->status = atoi(val->result[i]);
-                columnN++;
-                continue;
-
-            // DATE
-            case 3:
-                aTmodel[j]->date = val->result[i];
-                columnN++;
-                continue;
-            
-            // TASK
-            case 4: 
-                aTmodel[j]->task = val->result[i];
+                printf("%s\t", atoi(val->result[i]) ? "Start" : "Pause");
                 columnN++;
                 continue;
 
             // SECONDS
+            case 3:
+                hms = secToTime(atof(val->result[i]));
+                printf("%.2d:%.2d:%.2d\t", hms.hours, hms.min, hms.sec);
+                columnN++;
+                continue;
+
+            // DATE
+            case 4:
+                printf("%s\t", val->result[i]);
+                columnN++;
+                continue;
+            
+            // TASK
             case 5: 
-                start = val->result[i];
-                ++i;
-                if (val->result[i] != NULL)
-                {
-                    aTmodel[j]->seconds += getPeriod(start, val->result[i]);
-                }
+                printf("%s\n", val->result[i]);
                 columnN = 1;
                 continue;
         }
     }
-    
-    // Last init after for
-    if (j)
-    {
-        aTmodel[j] = NULL;
-    }
 
-    return aTmodel;
-}
-
-void freeStructTmodel(tmodel ** tmodel)
-{
-    if (!tmodel)
-    {
-        return;
-    }
-    
-    int i = 0;
-    
-    freeStructValues((*tmodel)->_v);
-
-    while(tmodel[i])
-    {
-        free(tmodel[i]);
-        ++i;
-    }
-
-    free(tmodel);
-}
-
-double getTaskTime(sqlite3 * db, char * sql, int id)
-{
-    int i, j, proxy;
-    double seconds = 0.0;
-    
-    values * val = malloc(sizeof(values));
-
-    QUERY_SELECT(val, db, sql, id);
-        
-    int count = val->columns * val->rows + val->columns;
-    
-    for (i = val->columns, j = 1; i < count; i++) {
-        if(j == 1) proxy = i;
-        if(j == 2 && val->result[i] != NULL) {
-  
-            seconds += getPeriod(val->result[proxy], val->result[i]);
-        }    
-        if(j == val->columns) j = 1;
-        else j++;
-    }
-    
-    freeStructValues(val); 
-    return seconds;
+    freeStructValues(val);
+    return;
 }
 
 cl secToTime(double seconds)
@@ -292,145 +212,12 @@ cl secToTime(double seconds)
     int allMin;
     cl hms = { 0 };
 
+    if (!s) return hms;
+
     hms.sec = s >= 60 ? s % 60 : s;
     allMin = s / 60;
     hms.min = allMin >= 60 ? allMin % 60 : allMin;
     hms.hours = allMin / 60;
 
     return hms;
-}
-
-int secToDays(double seconds)
-{
-    return (int)seconds / 60 / 60 / 24;
-}
-
-void printTableTask(sqlite3 * db, char * sql, int id)
-{
-    tmodel ** tmodel = initTmodel(db, 0);
-    int i = 0;
-    cl hms = { 0 };
-
-    while(tmodel && tmodel[i])
-    {
-        hms = secToTime(tmodel[i]->seconds);
-
-        printf("[%d]\t%.2d:%.2d:%.2d\t%s\t%s\t%s\n", 
-            tmodel[i]->id, hms.hours, hms.min, hms.sec, 
-            tmodel[i]->status ? "Start" : "Pause", tmodel[i]->date, tmodel[i]->task);
-
-        ++i;
-    }
-
-    freeStructTmodel(tmodel);
-}
-
-void printTableGroup(sqlite3 * db, char * sql, int id){
-    int i, j, k, timeId;
-    double seconds = .0, secondsNow = .0;
-    values * val = malloc(sizeof(values)),
-          * ids = malloc(sizeof(values));
-
-    if (id > 0)
-    {
-        QUERY_SELECT(val, db, sql, id);
-    }
-    else
-    {
-        QUERY_SELECT(val, db, "%s", sql);
-    }
-
-    int count = val->columns * val->rows + val->columns;
-
-    for (i = val->columns, j = 1; i < count; i++) {
-        switch(j) {
-            case 1:
-                timeId = atoi(val->result[i]);
-                printf("[%d]\t", timeId);
-
-                QUERY_SELECT(ids, db, "SELECT id FROM time WHERE groupid = %d", timeId);
-                int tcount = ids->columns * ids->rows + ids->columns;
-
-                for (k = ids->columns; k < tcount; k++) {
-                    seconds += getTaskTime(db, "select START, STOP from TASK where TIMEID = %d;", atoi(ids->result[k]));
-                    secondsNow += getTaskTime(db, "select START, STOP from TASK where TIMEID = %d AND strftime('%%Y-%%m-%%d', STOP) = date('now');",
-                                              atoi(ids->result[k]));
-                }
-
-                freeStructValues(ids);
-
-                j++;
-                break;
-
-            case 3:
-                printf("%s\n", val->result[i]);
-                j = 1;
-                break;
-       }
-        if (j == 2) {
-            cl hms = secToTime(seconds);
-            cl hmsNow = secToTime(secondsNow);
-
-            printf("%.2d:%.2d:%.2d\t", hms.hours, hms.min, hms.sec);
-            printf("%.2d:%.2d:%.2d\t", hmsNow.hours, hmsNow.min, hmsNow.sec);
-
-            seconds = 0.0;
-            secondsNow = 0.0;
-            j++;
-        }
-
-    }
-
-    freeStructValues(val);
-}
-
-void printTableTarget(sqlite3 * db, char * sql, int id)
-{
-    int i, j;
-    double seconds;
-    char curentTime[20];
-    values * val = malloc(sizeof(values));
-    time_t tp;
-
-    time(&tp);
-    struct tm * mytm = gmtime(&tp);
-
-    //mytm->tm_hour += 3;
-    strftime(curentTime, (size_t)20, "%Y-%m-%d %H:%M:%S", mytm);
-
-    if (id > 0) 
-    {
-        QUERY_SELECT(val, db, sql, id);
-    }
-    else
-    {
-        QUERY_SELECT(val, db, "%s", sql);
-    }
-
-    int count = val->columns * val->rows + val->columns;
-
-    for (i = val->columns, j = 1; i < count; i++) {
-        switch (j)
-        {
-            case 1:
-                printf("[%d]\t", atoi(val->result[i]));
-                j++;
-                break;
-
-            case 2:
-                seconds = getPeriod(val->result[i], curentTime);
-                printf("%s\t", val->result[i]);
-                printf("%d\t", secToDays(seconds));
-                j++;
-                break;
-
-            case 3:
-                printf("%s\n", val->result[i]);
-                j = 1;
-                break;
-        }
-    }
-
-    freeStructValues(val);
-
 }
